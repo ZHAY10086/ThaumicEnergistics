@@ -12,13 +12,13 @@ import thaumcraft.api.aspects.Aspect;
 public class EssentiaStack {
 
     private String aspect;
-    private int amount;
+    private long amount;
 
-    public EssentiaStack(Aspect aspect, int amount) {
+    public EssentiaStack(Aspect aspect, long amount) {
         this(aspect != null ? aspect.getTag() : "", amount);
     }
 
-    public EssentiaStack(String aspect, int amount) {
+    public EssentiaStack(String aspect, long amount) {
         if (aspect == null || aspect.isEmpty())
             throw new IllegalArgumentException("Aspect cannot be null");
         this.aspect = aspect;
@@ -40,23 +40,23 @@ public class EssentiaStack {
         return Aspect.getAspect(this.getAspectTag());
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(long amount) {
         this.amount = amount;
     }
 
-    public int getAmount() {
+    public long getAmount() {
         return this.amount;
     }
 
     public NBTTagCompound write(NBTTagCompound tag) {
         tag.setString("Aspect", this.getAspectTag());
-        tag.setInteger("Amount", this.getAmount());
+        tag.setLong("Amount", this.getAmount());
         return tag;
     }
 
     public void read(NBTTagCompound tag) {
         this.aspect = tag.getString("Aspect");
-        this.amount = tag.getInteger("Amount");
+        this.amount = tag.getLong("Amount");
     }
 
     public EssentiaStack copy() {

@@ -1,7 +1,5 @@
 package thaumicenergistics.integration.appeng;
 
-import static java.lang.Math.min;
-
 import appeng.api.AEApi;
 import appeng.api.config.FuzzyMode;
 import appeng.api.storage.IStorageChannel;
@@ -60,10 +58,9 @@ public class AEEssentiaStack implements IAEEssentiaStack, Comparable<AEEssentiaS
         EssentiaStack stack = EssentiaStack.readFromNBT(t);
         if (stack == null) return null;
         AEEssentiaStack ae = AEEssentiaStack.fromEssentiaStack(stack);
-        ae.setStackSize(t.getLong("AspectAmount"));
         ae.setCountRequestable(t.getLong("Req"));
         ae.setCraftable(t.getBoolean("Craft"));
-        return new AEEssentiaStack(stack.getAspect(), stack.getAmount());
+        return ae;
     }
 
     public static IAEEssentiaStack fromPacket(ByteBuf buf) {
@@ -120,7 +117,7 @@ public class AEEssentiaStack implements IAEEssentiaStack, Comparable<AEEssentiaS
 
     @Override
     public void incStackSize(long l) {
-        this.setStackSize(min(Integer.MAX_VALUE, this.getStackSize() + l));
+        this.setStackSize(this.getStackSize() + l);
     }
 
     @Override
@@ -145,7 +142,7 @@ public class AEEssentiaStack implements IAEEssentiaStack, Comparable<AEEssentiaS
 
     @Override
     public EssentiaStack getStack() {
-        return new EssentiaStack(this.getAspect(), (int) min(Integer.MAX_VALUE, this.stackSize));
+        return new EssentiaStack(this.getAspect(), this.stackSize);
     }
 
     @Override
