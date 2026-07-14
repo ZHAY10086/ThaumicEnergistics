@@ -17,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import thaumicenergistics.api.IThEItems;
 import thaumicenergistics.api.ThEApi;
 import thaumicenergistics.client.gui.part.GuiArcaneInscriber;
+import thaumicenergistics.client.gui.part.GuiEssentiaLevelEmitter;
 import thaumicenergistics.client.gui.part.GuiSharedEssentiaBus;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -62,12 +63,10 @@ public class ThEJEI implements IModPlugin {
                                 registerWorkbenchCatalyst(
                                         registry, new ACIRecipeTransferHandler<>(rthh), stack));
 
-        items.essentiaExportBus()
-                .maybeStack(1)
-                .ifPresent(
-                        stack ->
-                                registry.addGhostIngredientHandler(
-                                        GuiSharedEssentiaBus.class, new GhostEssentiaHandler()));
+        registry.addGhostIngredientHandler(
+                GuiSharedEssentiaBus.class, new GhostEssentiaHandler<>());
+        registry.addGhostIngredientHandler(
+                GuiEssentiaLevelEmitter.class, new GhostEssentiaHandler<>());
         items.arcaneInscriber()
                 .maybeStack(1)
                 .ifPresent(

@@ -13,7 +13,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import thaumcraft.api.aspects.Aspect;
 
-import thaumicenergistics.container.part.ContainerSharedEssentiaBus;
 import thaumicenergistics.container.slot.SlotGhostEssentia;
 import thaumicenergistics.util.ThELog;
 
@@ -58,7 +57,7 @@ public class PacketGhostEssentia implements IMessage {
                                 "Server received aspect '{}' using slot '{}'",
                                 message.aspect.getName(),
                                 openContainer);
-                        if ((!(openContainer instanceof ContainerSharedEssentiaBus))) {
+                        if (openContainer == null) {
                             return;
                         }
 

@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import mezz.jei.api.gui.IGhostIngredientHandler;
 
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -12,7 +13,6 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.common.items.ItemTCEssentiaContainer;
 
-import thaumicenergistics.client.gui.part.GuiSharedEssentiaBus;
 import thaumicenergistics.container.slot.SlotGhost;
 import thaumicenergistics.container.slot.SlotGhostEssentia;
 import thaumicenergistics.network.PacketHandler;
@@ -25,12 +25,11 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
-public class GhostEssentiaHandler implements IGhostIngredientHandler<GuiSharedEssentiaBus> {
+public class GhostEssentiaHandler<G extends GuiContainer> implements IGhostIngredientHandler<G> {
 
     @Override
     @Nonnull
-    public <I> List<Target<I>> getTargets(
-            @Nonnull GuiSharedEssentiaBus gui, @Nonnull I ingredient, boolean doStart) {
+    public <I> List<Target<I>> getTargets(@Nonnull G gui, @Nonnull I ingredient, boolean doStart) {
 
         Stream<Target<I>> essentiaContainers = getForEssentiaContainers(gui, ingredient);
         Stream<Target<I>> aspectList = getForAspectList(gui, ingredient);
@@ -38,7 +37,7 @@ public class GhostEssentiaHandler implements IGhostIngredientHandler<GuiSharedEs
         return Stream.concat(aspectList, essentiaContainers).collect(toList());
     }
 
-    private <I> Stream<Target<I>> getForEssentiaContainers(GuiSharedEssentiaBus gui, I ingredient) {
+    private <I> Stream<Target<I>> getForEssentiaContainers(G gui, I ingredient) {
 
         if (ingredient instanceof ItemStack) {
             ItemStack itemStack = (ItemStack) ingredient;
@@ -96,7 +95,7 @@ public class GhostEssentiaHandler implements IGhostIngredientHandler<GuiSharedEs
         return Stream.empty();
     }
 
-    private <I> Stream<Target<I>> getForAspectList(GuiSharedEssentiaBus gui, I ingredient) {
+    private <I> Stream<Target<I>> getForAspectList(G gui, I ingredient) {
 
         if (ingredient instanceof AspectList) {
             return gui.inventorySlots.inventorySlots.stream()
