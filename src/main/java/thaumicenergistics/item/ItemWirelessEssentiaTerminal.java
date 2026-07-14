@@ -227,4 +227,15 @@ public class ItemWirelessEssentiaTerminal extends ItemBase
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound nbt) {
         return new ForgeEnergyItemWrapper(stack, this);
     }
+
+    @Override
+    public boolean showDurabilityBar(ItemStack stack) {
+        return this.getAECurrentPower(stack) < this.getAEMaxPower(stack);
+    }
+
+    @Override
+    public double getDurabilityForDisplay(ItemStack stack) {
+        double max = this.getAEMaxPower(stack);
+        return max <= 0 ? 0 : 1.0 - (this.getAECurrentPower(stack) / max);
+    }
 }
