@@ -207,8 +207,8 @@ public class ThaumicEnergistics {
 
         // If we have a caster gauntlet then configure the sides
         if (heldItem.getItem() instanceof ItemCaster) {
-            if (player.isSneaking()) tile.disableSide(side, player);
-            else tile.setSideInput(side, player);
+            if (player.isSneaking()) tile.disableSide(side);
+            else tile.setSideInput(side);
             event.setCancellationResult(EnumActionResult.SUCCESS);
             event.setCanceled(true);
             // Per Forge's own documented contract on PlayerInteractEvent.RightClickBlock: "If ...
@@ -227,8 +227,8 @@ public class ThaumicEnergistics {
         if (heldItem.getItem() instanceof IEssentiaContainerItem) {
             AspectList aspects = ((IEssentiaContainerItem) heldItem.getItem()).getAspects(heldItem);
             if (aspects != null && aspects.size() == 1) {
-                if (player.isSneaking()) tile.disableSide(side, player);
-                else tile.setSideOutput(side, aspects.getAspects()[0], player);
+                if (player.isSneaking()) tile.disableSide(side);
+                else tile.setSideOutput(side, aspects.getAspects()[0]);
                 event.setCancellationResult(EnumActionResult.SUCCESS);
                 event.setCanceled(true);
             } else if (aspects != null && aspects.size() > 1) {

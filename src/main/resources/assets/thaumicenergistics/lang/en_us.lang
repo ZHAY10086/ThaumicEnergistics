@@ -52,10 +52,7 @@ tooltip.thaumicenergistics.arcane_assembler.busy=Status: busy
 tooltip.thaumicenergistics.arcane_assembler.progress=Progress:
 tooltip.thaumicenergistics.arcane_assembler.no_aspect=Error: out of aspect
 tooltip.thaumicenergistics.arcane_assembler.no_vis=Error: out of Vis
-tooltip.thaumicenergistics.essentia_interface.side_input=[ThE-DEBUG] Essentia Interface [%s]: INPUT (any aspect)
-tooltip.thaumicenergistics.essentia_interface.side_output=[ThE-DEBUG] Essentia Interface [%s]: OUTPUT (%s)
-tooltip.thaumicenergistics.essentia_interface.side_disabled=[ThE-DEBUG] Essentia Interface [%s]: DISABLED
-tooltip.thaumicenergistics.essentia_interface.multi_aspect_item=[ThE-DEBUG] That item holds multiple aspects -- use a single-aspect item to configure this side.
+tooltip.thaumicenergistics.essentia_interface.multi_aspect_item=That item holds multiple aspects -- use a single-aspect item to configure this side.
 
 # GUI
 gui.thaumicenergistics.essentia_import_bus=ME Essentia Import Bus
