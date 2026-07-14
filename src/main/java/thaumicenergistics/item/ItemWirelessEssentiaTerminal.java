@@ -238,4 +238,10 @@ public class ItemWirelessEssentiaTerminal extends ItemBase
         double max = this.getAEMaxPower(stack);
         return max <= 0 ? 0 : 1.0 - (this.getAECurrentPower(stack) / max);
     }
+
+    @Override
+    public boolean shouldCauseReequipAnimation(
+            ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        return slotChanged || oldStack.getItem() != newStack.getItem();
+    }
 }
