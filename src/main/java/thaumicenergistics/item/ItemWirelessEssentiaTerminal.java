@@ -14,12 +14,14 @@ import baubles.api.IBauble;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
@@ -133,6 +135,17 @@ public class ItemWirelessEssentiaTerminal extends ItemBase
                 linked
                         ? ThEApi.instance().lang().deviceLinked().getLocalizedKey()
                         : ThEApi.instance().lang().deviceUnlinked().getLocalizedKey());
+    }
+
+    @Override
+    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
+        if (!this.isInCreativeTab(tab)) return;
+        // Empty terminal.
+        items.add(new ItemStack(this));
+        // Fully charged terminal
+        ItemStack charged = new ItemStack(this);
+        this.setCurrentPower(charged, this.getAEMaxPower(charged));
+        items.add(charged);
     }
 
     @Optional.Method(modid = "baubles")
