@@ -252,6 +252,16 @@ public class ContainerWirelessEssentiaTerminal extends ContainerBaseTerminal
         return this.isValidContainer();
     }
 
+    @Override
+    public boolean isPowered() {
+        return this.player.world.isRemote || super.isPowered();
+    }
+
+    @Override
+    public boolean isActive() {
+        return this.player.world.isRemote || super.isActive();
+    }
+
     public boolean isValidContainer() {
         return this.isValidContainer;
     }
