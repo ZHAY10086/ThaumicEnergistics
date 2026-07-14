@@ -26,5 +26,13 @@ curse-ae2 = { module = "curse.maven:ae2-extended-life-570458", version = "514770
 curse-inventoryTweaks = { module = "curse.maven:inventory-tweaks-223094", version = "2482482" }
 curse-mouseTweaks = { module = "curse.maven:mouse-tweaks-60089", version = "3359843" }
 
+# Testing mods (runtime-only, for FE/RF charging tests)
+curse-redstoneFlux = { module = "curse.maven:redstone-flux-270789", version = "2920436" }
+curse-cofhCore = { module = "curse.maven:cofhcore-69162", version = "2920433" }
+curse-cofhWorld = { module = "curse.maven:cofh-world-271384", version = "2920434" }
+curse-thermalFoundation = { module = "curse.maven:thermal-foundation-222880", version = "2926428" }
+curse-thermalExpansion = { module = "curse.maven:thermal-expansion-69163", version = "2926431" }
+curse-codeChickenLib = { module = "curse.maven:codechicken-lib-1-8-242818", version = "2555141" }
+
 [plugins]
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
