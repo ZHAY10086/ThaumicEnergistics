@@ -64,16 +64,22 @@ public class ItemEssentiaCell extends ItemBase
         if (!player.isSneaking()) return super.onItemRightClick(world, player, hand);
         ItemStack held = player.getHeldItem(hand);
         if (held.isEmpty()) return super.onItemRightClick(world, player, hand);
+        // Force the disassembly to run server-side only to prevent duplication
+        if (world.isRemote || player.inventory.getCurrentItem() != held)
+            return ActionResult.newResult(EnumActionResult.SUCCESS, held);
+
         ICellInventoryHandler<IAEEssentiaStack> handler =
                 AEApi.instance()
                         .registries()
                         .cell()
                         .getCellInventory(held, null, this.getChannel());
-        if (handler == null)
-            throw new NullPointerException("Couldn't get ICellInventoryHandler for Essentia Cell");
-        if (!handler.getAvailableItems(this.getChannel().createList())
-                .isEmpty()) // Only try to separate cell if empty
-        return super.onItemRightClick(world, player, hand);
+        if (handler == null) {
+            return ActionResult.newResult(EnumActionResult.SUCCESS, held);
+        }
+        if (!handler.getAvailableItems(this.getChannel().createList()).isEmpty()) {
+            // Only try to separate cell if empty
+            return super.onItemRightClick(world, player, hand);
+        }
 
         Optional<ItemStack> cellComponentOptional = this.getComponentOfCell(held);
         Optional<ItemStack> emptyCasingOptional =
@@ -86,14 +92,13 @@ public class ItemEssentiaCell extends ItemBase
         InventoryPlayer inv = player.inventory;
         InventoryAdaptor invAdaptor = InventoryAdaptor.getAdaptor(player);
 
-        if (hand == EnumHand.MAIN_HAND) // Prevent accidental deletion when in off hand
         inv.setInventorySlotContents(inv.currentItem, ItemStack.EMPTY);
 
         ItemStack cellRemainder = invAdaptor.addItems(cellComponent);
         if (!cellRemainder.isEmpty()) player.dropItem(cellRemainder, false);
 
         ItemStack casingRemainder = invAdaptor.addItems(emptyCasing);
-        if (!casingRemainder.isEmpty()) player.dropItem(emptyCasing, false);
+        if (!casingRemainder.isEmpty()) player.dropItem(casingRemainder, false);
 
         if (player.inventoryContainer != null) player.inventoryContainer.detectAndSendChanges();
 
