@@ -1,5 +1,8 @@
 package thaumicenergistics.container.block;
 
+import appeng.api.AEApi;
+import appeng.api.implementations.guiobjects.IGuiItem;
+import appeng.api.implementations.guiobjects.INetworkTool;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.events.MENetworkCraftingPatternChange;
 
@@ -21,6 +24,7 @@ import thaumicenergistics.api.ThEApi;
 import thaumicenergistics.container.ContainerBase;
 import thaumicenergistics.container.slot.SlotKnowledgeCore;
 import thaumicenergistics.container.slot.SlotUpgrade;
+import thaumicenergistics.container.slot.ThESlot;
 import thaumicenergistics.item.ItemKnowledgeCore;
 import thaumicenergistics.item.ItemMaterial;
 import thaumicenergistics.network.PacketHandler;
@@ -36,6 +40,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
  */
 public class ContainerArcaneAssembler extends ContainerBase {
     protected TileArcaneAssembler TE;
+    private INetworkTool toolbox; // non-null when the player is carrying an AE2 Network Tool
 
     public ContainerArcaneAssembler(EntityPlayer player, TileArcaneAssembler TE) {
         super(player);
@@ -45,8 +50,46 @@ public class ContainerArcaneAssembler extends ContainerBase {
             this.addSlotToContainer(
                     new SlotUpgrade(this.getInventory("upgrades"), i, 186, 8 + i * 18));
         this.bindPlayerInventory(new PlayerMainInvWrapper(player.inventory), 0, 147);
+        this.setupToolbox(player);
         this.addListener(new KnowledgeCoreSlotListener());
         if (ForgeUtil.isServer()) TE.subscribe(player); // subscribe to aspect availability updates
+    }
+
+    /**
+     * If the player carries an AE2 Network Tool, surface its 3x3 upgrade-card slots as a toolbox in
+     * the bottom-right (AE2's own layout), so cards can be accessed without leaving the assembler.
+     */
+    private void setupToolbox(EntityPlayer player) {
+        for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
+            ItemStack stack = player.inventory.getStackInSlot(i);
+            if (AEApi.instance().definitions().items().networkTool().isSameAs(stack)
+                    && stack.getItem() instanceof IGuiItem) {
+                this.toolbox =
+                        (INetworkTool)
+                                ((IGuiItem) stack.getItem())
+                                        .getGuiObject(stack, this.TE.getWorld(), this.TE.getPos());
+                break;
+            }
+        }
+        if (this.toolbox == null) return;
+        IItemHandler inv = this.toolbox.getInventory();
+        for (int v = 0; v < 3; v++)
+            for (int u = 0; u < 3; u++)
+                this.addSlotToContainer(
+                        new ThESlot(inv, u + v * 3, 186 + u * 18, 149 + v * 18) {
+                            @Override
+                            public boolean isItemValid(ItemStack stack) {
+                                return super.isItemValid(stack)
+                                        || ThEApi.instance()
+                                                .items()
+                                                .upgradeArcane()
+                                                .isSameAs(stack);
+                            }
+                        });
+    }
+
+    public boolean hasToolbox() {
+        return this.toolbox != null;
     }
 
     public IItemHandler getInventory(String name) {

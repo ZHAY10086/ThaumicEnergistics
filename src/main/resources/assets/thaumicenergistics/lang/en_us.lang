@@ -30,7 +30,7 @@ item.thaumicenergistics.wireless_essentia_terminal.name=Wireless Essentia Termin
 item.thaumicenergistics.arcane_terminal.name=Arcane Crafting Terminal
 item.thaumicenergistics.arcane_inscriber.name=Arcane Inscriber
 
-item.thaumicenergistics.upgrade_arcane.name=Arcane Charging Upgrade
+item.thaumicenergistics.upgrade_arcane.name=Arcane Charging Card
 item.thaumicenergistics.knowledge_core.name=Knowledge Core
 item.thaumicenergistics.blank_knowledge_core.name=Blank Knowledge Core
 
@@ -160,13 +160,13 @@ research.essentiainterface.addenda.1=Each face configures independently, and nee
 research.arcaneterminal.title=Arcane Crafting Terminal
 research.arcaneterminal.stage.1=Having to hop back and forth between my ME system and my Arcane Workbench for every craft is getting frustrating. While it is vastly more complex than a mere Crafting Terminal, using the same principles, I should be able to hook my Arcane Workbench into my ME system.
 research.arcaneterminal.stage.2=The Arcane Crafting Terminal allows my Arcane Workbench to take full advantage of my ME system.
-research.arcaneterminal.addenda.1=I can upgrade my Arcane Crafting Terminal with the Arcane Charging Upgrade to allow it to access and draw vis from all neighboring chunks.
+research.arcaneterminal.addenda.1=I can upgrade my Arcane Crafting Terminal with the Arcane Charging Card to allow it to access and draw vis from all neighboring chunks.
 
 # Research Arcane Assembler
 research.arcaneassembler.title=Arcane Assembler
 research.arcaneassembler.stage.1=While being able to manually craft arcane items with my ME network is very helpful, the true power of ME is its auto-crafting ability. I should look into some way to make a Molecular Assembler able to craft arcane objects.
 research.arcaneassembler.stage.2=Everything ought to work - it can get the items, the vis, the Essentia crystals, the power. Yet it doesn't even attempt to craft! I have invented nothing more than a, albeit quite heavy, paperweight. A paperweight which can be augmented with multiple Acceleration Cards. This has been a massive disappointment.
-research.arcaneassembler.addenda.1=I can upgrade my Arcane Assembler with the Arcane Charging Upgrade to allow it to access and draw vis from all neighbouring chunks.
+research.arcaneassembler.addenda.1=I can upgrade my Arcane Assembler with the Arcane Charging Card to allow it to access and draw vis from all neighbouring chunks.
 research.arcaneassembler.addenda.2=Now that I have seen the Arcane Assembler in use, I have realised a pair of problems - the first being that Vis is consumed at an alarming rate while auto-crafting, often slowing down the process massively, and the second being that Vis Crystals are not shown in the recipe cost. I will need to figure out ways to avoid both of these problems to efficiently auto-craft.
 
 # Research Knowledge Core
