@@ -93,24 +93,23 @@ public class EssentiaContainerAdapter implements IMEInventoryHandler<IAEEssentia
             IAEEssentiaStack input, Actionable type, IActionSource src) {
         if (input == null || !input.isMeaningful() || !this.canAccept(input)) return input;
 
-        // Add to container to see how much it can store
-        int notAdded = this.container.addToContainer(input.getAspect(), (int) input.getStackSize());
+        // The Thaumcraft container API is int-based, so only try to hand over int amounts
+        long requested = input.getStackSize();
+        int toInject = (int) Math.min(Integer.MAX_VALUE, requested);
+        int notAdded = this.container.addToContainer(input.getAspect(), toInject);
+        long added = (long) toInject - notAdded;
         if (type == Actionable.SIMULATE) {
-            this.container.takeFromContainer(
-                    input.getAspect(), (int) input.getStackSize() - notAdded);
+            this.container.takeFromContainer(input.getAspect(), (int) added); // undo the simulate
         } else {
             this.resyncSnapshot(); // MODULATE actually committed a change
-            long added = input.getStackSize() - notAdded;
             if (added > 0) {
                 this.notifyOwnerNetwork(
                         AEUtil.getAEStackFromAspect(input.getAspect(), (int) added), src);
             }
         }
-        // Didn't add it all
-        if (notAdded > 0) {
-            return input.setStackSize(notAdded);
-        }
-        return null;
+        // Return whatever couldn't be stored, including any amount above the int saturation cap
+        long remainder = requested - added;
+        return remainder > 0 ? input.setStackSize(remainder) : null;
     }
 
     @Override
