@@ -49,8 +49,8 @@ public class AEEssentiaStack implements IAEEssentiaStack, Comparable<AEEssentiaS
         this.aspect = stack.getAspect();
         if (this.aspect == null) throw new IllegalArgumentException("Aspect is null");
         this.setStackSize(stack.getStackSize());
-        this.setCraftable(false);
-        this.setCountRequestable(0);
+        this.setCraftable(stack.isCraftable());
+        this.setCountRequestable(stack.getCountRequestable());
         this.hash = stack.hash;
     }
 
