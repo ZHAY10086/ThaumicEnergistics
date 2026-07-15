@@ -161,7 +161,6 @@ public class AEEssentiaStack implements IAEEssentiaStack, Comparable<AEEssentiaS
     @Override
     public void writeToNBT(NBTTagCompound t) {
         t.setString("Aspect", this.getAspect().getTag());
-        t.setByte("Count", (byte) 0);
         t.setLong("Amount", this.getStackSize());
         t.setLong("Req", this.getCountRequestable());
         t.setBoolean("Craft", this.isCraftable());
