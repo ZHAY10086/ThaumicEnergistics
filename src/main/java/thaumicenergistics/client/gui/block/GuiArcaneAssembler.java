@@ -1,5 +1,7 @@
 package thaumicenergistics.client.gui.block;
 
+import appeng.api.implementations.items.IUpgradeModule;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
@@ -13,6 +15,9 @@ import thaumcraft.codechicken.lib.math.MathHelper;
 import thaumicenergistics.api.ThEApi;
 import thaumicenergistics.client.gui.GuiBase;
 import thaumicenergistics.container.block.ContainerArcaneAssembler;
+import thaumicenergistics.container.slot.SlotKnowledgeCore;
+import thaumicenergistics.container.slot.SlotUpgrade;
+import thaumicenergistics.item.ItemKnowledgeCore;
 import thaumicenergistics.network.PacketHandler;
 import thaumicenergistics.network.packets.PacketAssemblerGUIUpdateRequest;
 import thaumicenergistics.network.packets.PacketSubscribe;
@@ -67,6 +72,13 @@ public class GuiArcaneAssembler extends GuiBase {
         this.xSize = WIDTH;
         this.ySize = HEIGHT;
         super.initGui();
+    }
+
+    @Override
+    protected void drawSlotHints() {
+        this.drawDedicatedSlotHint(
+                SlotKnowledgeCore.class, s -> s.getItem() instanceof ItemKnowledgeCore);
+        this.drawDedicatedSlotHint(SlotUpgrade.class, s -> s.getItem() instanceof IUpgradeModule);
     }
 
     @Override
