@@ -19,7 +19,6 @@ import appeng.api.storage.data.IItemList;
 import appeng.api.util.AECableType;
 import appeng.api.util.AEPartLocation;
 import appeng.me.GridAccessException;
-import appeng.me.cache.NetworkMonitor;
 
 import io.netty.buffer.ByteBuf;
 
@@ -223,10 +222,14 @@ public class PartEssentiaLevelEmitter extends PartBase
     private void updateReportingValue(IMEMonitor<IAEEssentiaStack> monitor) {
         Aspect target = this.config.getAspect(0);
         if (target == null) {
-            if (monitor instanceof NetworkMonitor) {
-                this.lastReportedValue =
-                        ((NetworkMonitor<IAEEssentiaStack>) monitor).getGridCurrentCount();
+            // No aspect configured -> emit on the total essentia in the network. AE2's
+            // NetworkMonitor.getGridCurrentCount() only tracks the item and fluid channels (returns
+            // 0 for essentia), so sum the essentia list ourselves.
+            long total = 0;
+            for (IAEEssentiaStack stack : monitor.getStorageList()) {
+                total += stack.getStackSize();
             }
+            this.lastReportedValue = total;
         } else {
             IAEEssentiaStack found =
                     monitor.getStorageList().findPrecise(AEUtil.getAEStackFromAspect(target, 0));
