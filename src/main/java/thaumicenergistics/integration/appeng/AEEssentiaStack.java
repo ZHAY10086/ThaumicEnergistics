@@ -212,8 +212,7 @@ public class AEEssentiaStack implements IAEEssentiaStack, Comparable<AEEssentiaS
 
     @Override
     public int compareTo(AEEssentiaStack o) {
-        int diff = this.hashCode() - o.hashCode();
-        return Integer.compare(diff, 0);
+        return Integer.compare(this.hashCode(), o.hashCode());
     }
 
     @Override
