@@ -75,10 +75,12 @@ public class ThEItems implements IThEItems {
     private final IItemDefinition itemDummyAspect;
 
     public ThEItems() {
-        this.itemEssentiaCell1k = ThEItems.createItem(new ItemEssentiaCell("1k", 1024, 12));
-        this.itemEssentiaCell4k = ThEItems.createItem(new ItemEssentiaCell("4k", 1024 * 4, 12));
-        this.itemEssentiaCell16k = ThEItems.createItem(new ItemEssentiaCell("16k", 1024 * 16, 12));
-        this.itemEssentiaCell64k = ThEItems.createItem(new ItemEssentiaCell("64k", 1024 * 64, 12));
+        this.itemEssentiaCell1k = ThEItems.createItem(new ItemEssentiaCell("1k", 0, 1024, 12));
+        this.itemEssentiaCell4k = ThEItems.createItem(new ItemEssentiaCell("4k", 1, 1024 * 4, 12));
+        this.itemEssentiaCell16k =
+                ThEItems.createItem(new ItemEssentiaCell("16k", 2, 1024 * 16, 12));
+        this.itemEssentiaCell64k =
+                ThEItems.createItem(new ItemEssentiaCell("64k", 3, 1024 * 64, 12));
         this.itemEssentiaCellCreative = ThEItems.createItem(new ItemCreativeEssentiaCell());
         this.itemEssentiaImportBus =
                 ThEItems.createItem(new ItemEssentiaImportBus("essentia_import"));

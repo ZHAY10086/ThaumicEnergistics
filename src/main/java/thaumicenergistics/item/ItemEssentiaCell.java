@@ -7,8 +7,6 @@ import appeng.api.storage.ICellInventoryHandler;
 import appeng.items.contents.CellUpgrades;
 import appeng.util.InventoryAdaptor;
 
-import com.google.common.base.Preconditions;
-
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
@@ -44,13 +42,17 @@ public class ItemEssentiaCell extends ItemBase
     private final String size;
     private final int bytes;
     private final int types;
+    private final int bytesPerType;
+    private final double idleDrain;
 
-    public ItemEssentiaCell(String size, int bytes, int types) {
+    public ItemEssentiaCell(String size, int tier, int bytes, int types) {
         super("essentia_cell_" + size);
 
         this.size = size;
         this.bytes = bytes;
         this.types = types;
+        this.bytesPerType = 8 << (2 * tier); // 8, 32, 128, 512
+        this.idleDrain = 0.5 * (tier + 1); // 0.5, 1.0, 1.5, 2.0
 
         this.setMaxStackSize(1);
         this.setMaxDamage(0);
@@ -106,11 +108,7 @@ public class ItemEssentiaCell extends ItemBase
     }
 
     private Optional<ItemStack> getComponentOfCell(ItemStack stack) {
-        Preconditions.checkNotNull(stack);
-        Preconditions.checkNotNull(stack.getItem());
-        Preconditions.checkNotNull(stack.getItem().getRegistryName());
-        Preconditions.checkNotNull(stack.getItem().getRegistryName().getPath());
-        switch (stack.getItem().getRegistryName().getPath().split("_")[2]) {
+        switch (this.size) {
             case "1k":
                 return ThEApi.instance().items().essentiaComponent1k().maybeStack(1);
             case "4k":
@@ -142,7 +140,7 @@ public class ItemEssentiaCell extends ItemBase
 
     @Override
     public int getBytesPerType(ItemStack itemStack) {
-        return 8;
+        return this.bytesPerType;
     }
 
     @Override
@@ -167,7 +165,7 @@ public class ItemEssentiaCell extends ItemBase
 
     @Override
     public double getIdleDrain() {
-        return 1;
+        return this.idleDrain;
     }
 
     @Override
