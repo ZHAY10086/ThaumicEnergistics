@@ -10,6 +10,7 @@ import thaumicenergistics.api.ThEApi;
 import thaumicenergistics.client.gui.component.GuiImageButton;
 import thaumicenergistics.container.ActionType;
 import thaumicenergistics.container.part.ContainerArcaneInscriber;
+import thaumicenergistics.container.slot.SlotKnowledgeCore;
 import thaumicenergistics.container.slot.ThEGhostSlot;
 import thaumicenergistics.init.ModGlobals;
 import thaumicenergistics.item.ItemKnowledgeCore;
@@ -86,6 +87,12 @@ public class GuiArcaneInscriber extends GuiArcaneTerminal {
     protected void recalcSlotY(Slot slot) {
         super.recalcSlotY(slot);
         if (slot instanceof ThEGhostSlot) ((ThEGhostSlot) slot).recalculateY(this.rows);
+    }
+
+    @Override
+    protected void drawSlotHints() {
+        this.drawDedicatedSlotHint(
+                SlotKnowledgeCore.class, s -> s.getItem() instanceof ItemKnowledgeCore);
     }
 
     @Override
