@@ -13,8 +13,10 @@ import appeng.api.util.AEPartLocation;
 
 import com.google.common.collect.Lists;
 
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
@@ -53,6 +55,7 @@ import thaumicenergistics.container.ThETerminalNetworkSync;
 import thaumicenergistics.container.crafting.ContainerCraftAmountBridge;
 import thaumicenergistics.container.slot.SlotArcaneMatrix;
 import thaumicenergistics.container.slot.SlotArcaneResult;
+import thaumicenergistics.container.slot.SlotArmor;
 import thaumicenergistics.container.slot.SlotUpgrade;
 import thaumicenergistics.init.ModGUIs;
 import thaumicenergistics.integration.appeng.util.ThEActionSource;
@@ -254,6 +257,14 @@ public class ContainerArcaneTerminal extends ContainerBaseTerminal
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
         if (ForgeUtil.isClient() || index < 0 || index > this.inventorySlots.size())
             return super.transferStackInSlot(playerIn, index);
+        ItemStack armorHandled =
+                this.routeDedicatedSlot(
+                        index,
+                        SlotArmor.class,
+                        s ->
+                                EntityLiving.getSlotForItemStack(s).getSlotType()
+                                        == EntityEquipmentSlot.Type.ARMOR);
+        if (armorHandled != null) return armorHandled;
         Slot slot = this.inventorySlots.get(index);
         if (slot.getHasStack() && !slot.getStack().isEmpty()) {
             IAEItemStack remaining =

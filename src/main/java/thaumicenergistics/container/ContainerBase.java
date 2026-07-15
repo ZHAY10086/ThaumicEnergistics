@@ -66,6 +66,7 @@ public abstract class ContainerBase extends Container {
 
         // OUT: shift-click the dedicated slot -> player inventory, bypassing the ME network.
         if (destSlotType.isInstance(slot)) {
+            if (!slot.canTakeStack(this.player)) return ItemStack.EMPTY; // e.g. binding-curse armor
             ItemStack moving = slot.getStack().copy();
             if (this.playerSlotStart >= 0
                     && this.mergeItemStack(

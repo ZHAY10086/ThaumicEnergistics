@@ -12,8 +12,10 @@ import appeng.core.localization.GuiText;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ClickType;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.Slot;
 import net.minecraft.util.ResourceLocation;
 
@@ -28,6 +30,7 @@ import thaumicenergistics.client.gui.helpers.MERepo;
 import thaumicenergistics.config.ThEConfig;
 import thaumicenergistics.container.ActionType;
 import thaumicenergistics.container.part.ContainerArcaneTerminal;
+import thaumicenergistics.container.slot.SlotArmor;
 import thaumicenergistics.container.slot.SlotME;
 import thaumicenergistics.container.slot.ThESlot;
 import thaumicenergistics.init.ModGUIs;
@@ -201,6 +204,15 @@ public class GuiArcaneTerminal extends GuiAbstractTerminal<IAEItemStack, IItemSt
 
     protected void recalcSlotY(Slot slot) {
         if (slot instanceof ThESlot) ((ThESlot) slot).recalculateY(this.rows);
+    }
+
+    @Override
+    protected void drawSlotHints() {
+        this.drawDedicatedSlotHint(
+                SlotArmor.class,
+                s ->
+                        EntityLiving.getSlotForItemStack(s).getSlotType()
+                                == EntityEquipmentSlot.Type.ARMOR);
     }
 
     @Override

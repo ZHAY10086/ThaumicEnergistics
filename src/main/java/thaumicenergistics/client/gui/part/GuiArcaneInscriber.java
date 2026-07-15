@@ -91,6 +91,7 @@ public class GuiArcaneInscriber extends GuiArcaneTerminal {
 
     @Override
     protected void drawSlotHints() {
+        super.drawSlotHints();
         this.drawDedicatedSlotHint(
                 SlotKnowledgeCore.class, s -> s.getItem() instanceof ItemKnowledgeCore);
     }
