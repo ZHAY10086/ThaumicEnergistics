@@ -49,6 +49,18 @@ public class ContainerArcaneInscriber extends ContainerArcaneTerminal
     }
 
     @Override
+    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
+        if (ForgeUtil.isClient() || index < 0 || index >= this.inventorySlots.size())
+            return super.transferStackInSlot(playerIn, index);
+        ItemStack handled =
+                this.routeDedicatedSlot(
+                        index,
+                        SlotKnowledgeCore.class,
+                        s -> s.getItem() instanceof ItemKnowledgeCore);
+        return handled != null ? handled : super.transferStackInSlot(playerIn, index);
+    }
+
+    @Override
     public void onAction(EntityPlayerMP player, PacketUIAction packet) {
         super.onAction(player, packet);
         if (ForgeUtil.isServer()) {

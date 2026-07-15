@@ -21,6 +21,8 @@ import thaumicenergistics.util.EssentiaFilter;
 import thaumicenergistics.util.ForgeUtil;
 import thaumicenergistics.util.ItemHandlerUtil;
 
+import java.util.function.Predicate;
+
 /**
  * The base container for all containers in Thaumic Energistics
  *
@@ -32,6 +34,14 @@ public abstract class ContainerBase extends Container {
 
     public EntityPlayer player;
 
+    /**
+     * Bounds [start, end) of the player-inventory slot block, recorded by {@link
+     * #bindPlayerInventory}.
+     */
+    protected int playerSlotStart = -1;
+
+    protected int playerSlotEnd = -1;
+
     public ContainerBase(EntityPlayer player) {
         this.player = player;
     }
@@ -40,6 +50,48 @@ public abstract class ContainerBase extends Container {
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
         // TODO
         return ItemStack.EMPTY;
+    }
+
+    /**
+     * Two-way shift-click routing for a dedicated single-item slot (knowledge core, discount gear,
+     * ...). A stack matching {@code accepts} in any other slot is routed INTO the first empty,
+     * valid {@code destSlotType} slot; shift-clicking the dedicated slot itself sends its contents
+     * to the player inventory (never into the ME network). Returns the (empty) transfer result when
+     * it handled the click, or {@code null} to signal "not mine - fall through to the default
+     * transfer".
+     */
+    protected ItemStack routeDedicatedSlot(
+            int index, Class<? extends Slot> destSlotType, Predicate<ItemStack> accepts) {
+        Slot slot = this.inventorySlots.get(index);
+        if (slot == null || !slot.getHasStack()) return null;
+
+        // OUT: shift-click the dedicated slot -> player inventory, bypassing the ME network.
+        if (destSlotType.isInstance(slot)) {
+            ItemStack moving = slot.getStack().copy();
+            if (this.playerSlotStart >= 0
+                    && this.mergeItemStack(
+                            moving, this.playerSlotStart, this.playerSlotEnd, true)) {
+                slot.putStack(moving.isEmpty() ? ItemStack.EMPTY : moving);
+                slot.onSlotChanged();
+                this.detectAndSendChanges();
+            }
+            return ItemStack.EMPTY;
+        }
+
+        // IN: shift-click a matching item elsewhere -> the dedicated slot.
+        if (accepts.test(slot.getStack())) {
+            for (Slot target : this.inventorySlots) {
+                if (!destSlotType.isInstance(target) || target.getHasStack()) continue;
+                if (!target.isItemValid(slot.getStack())) continue;
+                ItemStack one = slot.getStack().copy();
+                one.setCount(1);
+                target.putStack(one);
+                slot.decrStackSize(1);
+                this.detectAndSendChanges();
+                return ItemStack.EMPTY;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -138,6 +190,7 @@ public abstract class ContainerBase extends Container {
     }
 
     protected void bindPlayerInventory(IItemHandler player, int offsetX, int offsetY) {
+        this.playerSlotStart = this.inventorySlots.size();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 9; j++) {
                 this.addSlotToContainer(
@@ -148,6 +201,7 @@ public abstract class ContainerBase extends Container {
         for (int i = 0; i < 9; i++) {
             this.addSlotToContainer(new ThESlot(player, i, offsetX + 8 + 18 * i, offsetY + 60));
         }
+        this.playerSlotEnd = this.inventorySlots.size();
     }
 
     /**
