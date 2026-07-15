@@ -18,6 +18,8 @@ import thaumicenergistics.api.storage.IAEEssentiaStack;
 import thaumicenergistics.api.storage.IEssentiaStorageChannel;
 import thaumicenergistics.item.ItemDummyAspect;
 
+import java.util.Locale;
+
 /**
  * @author BrockWS
  */
@@ -37,7 +39,10 @@ public class AEEssentiaStack implements IAEEssentiaStack, Comparable<AEEssentiaS
         this.setStackSize(amount);
         this.setCraftable(false);
         this.setCountRequestable(0);
-        this.hash = this.aspect.hashCode();
+        // Derive the hash from the (normalized) aspect tag so it's consistent with the
+        // case-insensitive tag equality and stable across JVM runs - rather than the Aspect's
+        // identity hash, which Thaumcraft leaves as Object's and which changes every run.
+        this.hash = this.aspect.getTag().toLowerCase(Locale.ROOT).hashCode();
     }
 
     private AEEssentiaStack(AEEssentiaStack stack) {
@@ -222,18 +227,12 @@ public class AEEssentiaStack implements IAEEssentiaStack, Comparable<AEEssentiaS
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof AEEssentiaStack) {
-            return ((AEEssentiaStack) obj)
-                    .getAspect()
-                    .getTag()
-                    .equalsIgnoreCase(this.getAspect().getTag());
-        }
-        if (obj instanceof EssentiaStack) {
-            return ((EssentiaStack) obj)
-                    .getAspect()
-                    .getTag()
-                    .equalsIgnoreCase(this.getAspect().getTag());
-        }
-        return false;
+        if (this == obj) return true;
+        // Must not also match plain EssentiaStack: it never overrides equals(), so a cross-type
+        // match here would be asymmetric and violate the Object.equals contract.
+        if (!(obj instanceof AEEssentiaStack)) return false;
+        return this.getAspect()
+                .getTag()
+                .equalsIgnoreCase(((AEEssentiaStack) obj).getAspect().getTag());
     }
 }
