@@ -42,6 +42,7 @@ tooltip.thaumicenergistics.device_out_of_range=Терминал вне зоны 
 tooltip.thaumicenergistics.device_linked=Привязан
 tooltip.thaumicenergistics.device_unlinked=Не привязан
 tooltip.thaumicenergistics.stored_energy=Накопленная энергия
+tooltip.thaumicenergistics.essentia_cell_creative.description=Содержит все виды эссенции
 
 # GUI
 gui.thaumicenergistics.essentia_import_bus=МЭ Шина импорта эссенции

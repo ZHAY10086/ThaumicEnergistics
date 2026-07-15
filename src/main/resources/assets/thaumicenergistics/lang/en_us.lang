@@ -55,6 +55,7 @@ tooltip.thaumicenergistics.arcane_assembler.no_vis=Error: out of Vis
 tooltip.thaumicenergistics.essentia_interface.multi_aspect_item=That item holds multiple aspects -- use a single-aspect item to configure this side.
 tooltip.thaumicenergistics.knowledge_core.recipes=Stored recipes: %d
 tooltip.thaumicenergistics.knowledge_core.hold_shift=Hold Shift for list
+tooltip.thaumicenergistics.essentia_cell_creative.description=Contains all types of essentia
 
 # GUI
 gui.thaumicenergistics.essentia_import_bus=ME Essentia Import Bus
