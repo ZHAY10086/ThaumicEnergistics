@@ -117,8 +117,10 @@ public class AEUtil {
             toAdd = Math.min((long) ((availablePower * energyFactor) + 0.9), toAdd);
         }
 
-        if (toAdd < 1) // We either cannot store one item or don't have enough energy too
-        return input;
+        // We either cannot store one item or don't have enough energy too
+        if (toAdd < 1) {
+            return input;
+        }
 
         if (mode == Actionable.SIMULATE) {
             T s = input.copy().setStackSize(input.getStackSize() - toAdd);
@@ -128,8 +130,10 @@ public class AEUtil {
         if (energy != null)
             energy.extractAEPower(
                     toAdd / energyFactor, Actionable.MODULATE, PowerMultiplier.CONFIG);
-        if (input.getStackSize() == toAdd) // We have enough power to add everything
-        return inv.injectItems(input, Actionable.MODULATE, src);
+        // We have enough power to add everything
+        if (input.getStackSize() == toAdd) {
+            return inv.injectItems(input, Actionable.MODULATE, src);
+        }
 
         T split = input.copy();
         input.setStackSize(toAdd);
@@ -166,8 +170,10 @@ public class AEUtil {
 
         T canExtract = inv.extractItems(input.copy(), Actionable.SIMULATE, src);
 
-        if (canExtract == null) // There is no item
-        return null;
+        // There is no item
+        if (canExtract == null) {
+            return null;
+        }
 
         long toExtract = canExtract.getStackSize();
 
@@ -202,15 +208,11 @@ public class AEUtil {
                 inv, AEEssentiaStack.fromEssentiaStack(new EssentiaStack(aspect, 1)));
     }
 
-    public static IAEEssentiaStack getAEStackFromAspect(Aspect aspect, int amount) {
+    public static IAEEssentiaStack getAEStackFromAspect(Aspect aspect, long amount) {
         return AEApi.instance()
                 .storage()
                 .getStorageChannel(IEssentiaStorageChannel.class)
                 .createStack(new EssentiaStack(aspect, amount));
-    }
-
-    public static IAEEssentiaStack getAEStackFromAspect(Aspect aspect) {
-        return AEUtil.getAEStackFromAspect(aspect, Integer.MAX_VALUE);
     }
 
     public static <T extends IAEStack<T>, C extends IStorageChannel<T>> C getStorageChannel(
