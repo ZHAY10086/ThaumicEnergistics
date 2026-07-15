@@ -306,6 +306,7 @@ public class PartEssentiaLevelEmitter extends PartBase
 
     @Override
     public boolean onActivate(EntityPlayer player, EnumHand hand, Vec3d vec3d) {
+        if (this.useMemoryCard(player, hand)) return true;
         if (ForgeUtil.isServer())
             GuiHandler.openGUI(
                     ModGUIs.ESSENTIA_LEVEL_EMITTER, player, this.hostTile.getPos(), this.side);
@@ -353,5 +354,26 @@ public class PartEssentiaLevelEmitter extends PartBase
         tag.setBoolean("prevState", this.prevState);
         tag.setTag("config", this.config.serializeNBT());
         this.getConfigManager().writeToNBT(tag);
+    }
+
+    // Memory card copies the target aspect + threshold + settings (redstone mode), not runtime
+    // state.
+    @Override
+    protected NBTTagCompound downloadMemoryCardSettings() {
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setTag("config", this.config.serializeNBT());
+        tag.setLong("reportingValue", this.reportingValue);
+        this.getConfigManager().writeToNBT(tag);
+        return tag;
+    }
+
+    @Override
+    protected void uploadMemoryCardSettings(NBTTagCompound data) {
+        if (data == null) return;
+        if (data.hasKey("config")) this.config.deserializeNBT(data.getCompoundTag("config"));
+        if (data.hasKey("reportingValue")) this.reportingValue = data.getLong("reportingValue");
+        this.getConfigManager().readFromNBT(data);
+        this.configureWatchers();
+        this.host.markForUpdate();
     }
 }

@@ -1,5 +1,8 @@
 package thaumicenergistics;
 
+import appeng.api.implementations.items.IMemoryCard;
+import appeng.api.implementations.items.MemoryCardMessages;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -204,6 +207,23 @@ public class ThaumicEnergistics {
         TileEssentiaInterface tile = (TileEssentiaInterface) te;
         EntityPlayer player = event.getEntityPlayer();
         ItemStack heldItem = event.getItemStack();
+
+        if (heldItem.getItem() instanceof IMemoryCard) {
+            IMemoryCard card = (IMemoryCard) heldItem.getItem();
+            String name = tile.getBlockType().getTranslationKey();
+            if (player.isSneaking()) {
+                card.setMemoryCardContents(heldItem, name, tile.getMemoryCardData());
+                card.notifyUser(player, MemoryCardMessages.SETTINGS_SAVED);
+            } else if (name.equals(card.getSettingsName(heldItem))) {
+                tile.applyMemoryCardData(card.getData(heldItem));
+                card.notifyUser(player, MemoryCardMessages.SETTINGS_LOADED);
+            } else {
+                card.notifyUser(player, MemoryCardMessages.INVALID_MACHINE);
+            }
+            event.setCancellationResult(EnumActionResult.SUCCESS);
+            event.setCanceled(true);
+            return;
+        }
 
         // If we have a caster gauntlet then configure the sides
         if (heldItem.getItem() instanceof ItemCaster) {

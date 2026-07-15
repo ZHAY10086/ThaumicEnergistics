@@ -152,6 +152,9 @@ public class PartEssentiaExportBus extends PartSharedEssentiaBus {
 
     @Override
     public boolean onActivate(EntityPlayer player, EnumHand hand, Vec3d vec3d) {
+        if (this.useMemoryCard(player, hand)) {
+            return true;
+        }
         if ((player.isSneaking()
                 && AEUtil.isWrench(player.getHeldItem(hand), player, this.getTile().getPos())))
             return false;

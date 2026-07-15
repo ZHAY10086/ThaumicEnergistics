@@ -5,6 +5,8 @@ import appeng.api.config.Settings;
 import appeng.api.config.Upgrades;
 import appeng.api.implementations.IPowerChannelState;
 import appeng.api.implementations.IUpgradeableHost;
+import appeng.api.implementations.items.IMemoryCard;
+import appeng.api.implementations.items.MemoryCardMessages;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.events.MENetworkBootingStatusChange;
 import appeng.api.networking.events.MENetworkEventSubscribe;
@@ -252,6 +254,34 @@ public abstract class PartBase
     public boolean onActivate(EntityPlayer entityPlayer, EnumHand enumHand, Vec3d vec3d) {
         return false;
     }
+
+    protected boolean useMemoryCard(EntityPlayer player, EnumHand hand) {
+        ItemStack held = player.getHeldItem(hand);
+        if (held.isEmpty() || !(held.getItem() instanceof IMemoryCard)) return false;
+        // The server owns the copy/paste. Both sides swallow the click so the GUI doesn't open
+        if (ForgeUtil.isClient()) return true;
+        IMemoryCard card = (IMemoryCard) held.getItem();
+        String name = this.getItemStack(PartItemStack.NETWORK).getTranslationKey();
+        if (player.isSneaking()) {
+            NBTTagCompound data = this.downloadMemoryCardSettings();
+            if (data != null) {
+                card.setMemoryCardContents(held, name, data);
+                card.notifyUser(player, MemoryCardMessages.SETTINGS_SAVED);
+            }
+        } else if (name.equals(card.getSettingsName(held))) {
+            this.uploadMemoryCardSettings(card.getData(held));
+            card.notifyUser(player, MemoryCardMessages.SETTINGS_LOADED);
+        } else {
+            card.notifyUser(player, MemoryCardMessages.INVALID_MACHINE);
+        }
+        return true;
+    }
+
+    protected NBTTagCompound downloadMemoryCardSettings() {
+        return null;
+    }
+
+    protected void uploadMemoryCardSettings(NBTTagCompound data) {}
 
     @Override
     public boolean onShiftActivate(EntityPlayer entityPlayer, EnumHand enumHand, Vec3d vec3d) {

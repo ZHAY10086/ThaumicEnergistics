@@ -176,6 +176,23 @@ public abstract class PartSharedEssentiaBus extends PartBase
     }
 
     @Override
+    protected NBTTagCompound downloadMemoryCardSettings() {
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setTag("config", this.config.serializeNBT());
+        this.getConfigManager().writeToNBT(tag);
+        return tag;
+    }
+
+    @Override
+    protected void uploadMemoryCardSettings(NBTTagCompound data) {
+        if (data == null) return;
+        if (data.hasKey("config")) this.config.deserializeNBT(data.getCompoundTag("config"));
+        this.getConfigManager().readFromNBT(data);
+        this.filterChanged();
+        this.host.markForUpdate();
+    }
+
+    @Override
     public int getInstalledUpgrades(Upgrades upgrade) {
         return this.upgrades.getUpgrades(upgrade);
     }

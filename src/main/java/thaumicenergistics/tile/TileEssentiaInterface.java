@@ -235,6 +235,24 @@ public class TileEssentiaInterface extends TileNetwork
         return list;
     }
 
+    public NBTTagCompound getMemoryCardData() {
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setTag("sideConfig", this.writeSideConfig());
+        return tag;
+    }
+
+    public void applyMemoryCardData(NBTTagCompound data) {
+        if (data == null) return;
+        this.readSideConfig(data);
+        this.markDirty();
+        this.notifyNeighborOfConnectivityChange();
+        this.updateTickingState();
+        if (this.world != null && !this.world.isRemote) {
+            IBlockState state = this.world.getBlockState(this.pos);
+            this.world.notifyBlockUpdate(this.pos, state, state, 3);
+        }
+    }
+
     private void readSideConfig(NBTTagCompound compound) {
         this.sideModes.clear();
         this.outputAspects.clear();
