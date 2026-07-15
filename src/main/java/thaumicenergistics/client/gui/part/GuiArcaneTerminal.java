@@ -32,6 +32,7 @@ import thaumicenergistics.container.ActionType;
 import thaumicenergistics.container.part.ContainerArcaneTerminal;
 import thaumicenergistics.container.slot.SlotArmor;
 import thaumicenergistics.container.slot.SlotME;
+import thaumicenergistics.container.slot.SlotUpgrade;
 import thaumicenergistics.container.slot.ThESlot;
 import thaumicenergistics.init.ModGUIs;
 import thaumicenergistics.integration.jei.ThEJEI;
@@ -213,6 +214,7 @@ public class GuiArcaneTerminal extends GuiAbstractTerminal<IAEItemStack, IItemSt
                 s ->
                         EntityLiving.getSlotForItemStack(s).getSlotType()
                                 == EntityEquipmentSlot.Type.ARMOR);
+        this.drawDedicatedSlotHint(SlotUpgrade.class, s -> true);
     }
 
     @Override

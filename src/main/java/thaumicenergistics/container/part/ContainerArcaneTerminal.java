@@ -265,6 +265,9 @@ public class ContainerArcaneTerminal extends ContainerBaseTerminal
                                 EntityLiving.getSlotForItemStack(s).getSlotType()
                                         == EntityEquipmentSlot.Type.ARMOR);
         if (armorHandled != null) return armorHandled;
+        // Route upgrade cards to/from the upgrade slot instead of the ME network
+        ItemStack upgradeHandled = this.routeDedicatedSlot(index, SlotUpgrade.class, s -> true);
+        if (upgradeHandled != null) return upgradeHandled;
         Slot slot = this.inventorySlots.get(index);
         if (slot.getHasStack() && !slot.getStack().isEmpty()) {
             IAEItemStack remaining =
