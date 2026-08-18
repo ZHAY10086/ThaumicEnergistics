@@ -36,6 +36,7 @@ import thaumicenergistics.network.PacketHandler;
 import thaumicenergistics.network.packets.PacketInvHeldUpdate;
 import thaumicenergistics.network.packets.PacketMEEssentiaUpdate;
 import thaumicenergistics.network.packets.PacketUIAction;
+import thaumicenergistics.network.packets.PacketWirelessTerminalPowerUpdate;
 import thaumicenergistics.util.AEUtil;
 import thaumicenergistics.util.ForgeUtil;
 
@@ -67,6 +68,11 @@ public class ContainerWirelessEssentiaTerminal extends ContainerBaseTerminal
     private IMEMonitor<IAEEssentiaStack> monitor;
     private boolean isValidContainer = true;
     private int ticksSinceCheck = 0;
+
+    private boolean syncedPowered = true;
+    private boolean syncedActive = true;
+    private boolean lastSentPowered = true;
+    private boolean lastSentActive = true;
 
     public ContainerWirelessEssentiaTerminal(
             EntityPlayer player, ThEWirelessEssentiaGuiObject host) {
@@ -235,8 +241,23 @@ public class ContainerWirelessEssentiaTerminal extends ContainerBaseTerminal
             if (this.isValidContainer() && !this.wirelessHost.rangeCheck()) {
                 this.closeWithMessage(ThEApi.instance().lang().deviceOutOfRange());
             }
+
+            this.syncPowerState();
         }
         super.detectAndSendChanges();
+    }
+
+    private void syncPowerState() {
+        boolean powered = this.wirelessHost.isPowered();
+        boolean active = this.wirelessHost.isActive();
+        if (powered == this.lastSentPowered && active == this.lastSentActive) return;
+        this.lastSentPowered = powered;
+        this.lastSentActive = active;
+        if (this.player instanceof EntityPlayerMP) {
+            PacketHandler.sendToPlayer(
+                    (EntityPlayerMP) this.player,
+                    new PacketWirelessTerminalPowerUpdate(powered, active));
+        }
     }
 
     private void closeWithMessage(IThELangKey message) {
@@ -254,12 +275,17 @@ public class ContainerWirelessEssentiaTerminal extends ContainerBaseTerminal
 
     @Override
     public boolean isPowered() {
-        return this.player.world.isRemote || super.isPowered();
+        return ForgeUtil.isClient() ? this.syncedPowered : super.isPowered();
     }
 
     @Override
     public boolean isActive() {
-        return this.player.world.isRemote || super.isActive();
+        return ForgeUtil.isClient() ? this.syncedActive : super.isActive();
+    }
+
+    public void setSyncedPowerState(boolean powered, boolean active) {
+        this.syncedPowered = powered;
+        this.syncedActive = active;
     }
 
     public boolean isValidContainer() {
