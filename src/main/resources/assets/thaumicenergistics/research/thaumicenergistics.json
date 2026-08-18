@@ -414,7 +414,10 @@
       ],
       "addenda": [
         {
-          "text": "research.essentiainterface.addenda.1"
+          "text": "research.essentiainterface.addenda.1",
+          "required_research": [
+            "ESSENTIAINTERFACE"
+          ]
         }
       ]
     },
