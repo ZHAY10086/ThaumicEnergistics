@@ -109,6 +109,7 @@ public abstract class GuiBase extends GuiContainer {
             Class<? extends Slot> destSlotType, Predicate<ItemStack> accepts) {
         if (this.hoveredSlot == null
                 || !this.hoveredSlot.getHasStack()
+                || destSlotType.isInstance(this.hoveredSlot)
                 || !accepts.test(this.hoveredSlot.getStack())) return;
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
