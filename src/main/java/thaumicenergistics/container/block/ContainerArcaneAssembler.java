@@ -33,6 +33,9 @@ import thaumicenergistics.tile.TileArcaneAssembler;
 import thaumicenergistics.util.ForgeUtil;
 import thaumicenergistics.util.ItemHandlerUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
@@ -41,6 +44,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class ContainerArcaneAssembler extends ContainerBase {
     protected TileArcaneAssembler TE;
     private INetworkTool toolbox; // non-null when the player is carrying an AE2 Network Tool
+    private ItemStack toolboxStack = ItemStack.EMPTY;
+    private final List<ThESlot> toolboxSlots = new ArrayList<>();
 
     public ContainerArcaneAssembler(EntityPlayer player, TileArcaneAssembler TE) {
         super(player);
@@ -68,14 +73,15 @@ public class ContainerArcaneAssembler extends ContainerBase {
                         (INetworkTool)
                                 ((IGuiItem) stack.getItem())
                                         .getGuiObject(stack, this.TE.getWorld(), this.TE.getPos());
+                this.toolboxStack = stack;
                 break;
             }
         }
         if (this.toolbox == null) return;
         IItemHandler inv = this.toolbox.getInventory();
         for (int v = 0; v < 3; v++)
-            for (int u = 0; u < 3; u++)
-                this.addSlotToContainer(
+            for (int u = 0; u < 3; u++) {
+                ThESlot slot =
                         new ThESlot(inv, u + v * 3, 186 + u * 18, 149 + v * 18) {
                             @Override
                             public boolean isItemValid(ItemStack stack) {
@@ -85,11 +91,39 @@ public class ContainerArcaneAssembler extends ContainerBase {
                                                 .upgradeArcane()
                                                 .isSameAs(stack);
                             }
-                        });
+                        };
+                this.toolboxSlots.add(slot);
+                this.addSlotToContainer(slot);
+            }
+    }
+
+    /**
+     * Unlike AE2's own ContainerNetworkTool (which locks a specific inventory slot and closes
+     * outright if it empties), the toolbox here is a bonus panel on top of an otherwise-valid
+     * Arcane Assembler session -- so instead of closing the whole GUI, detach the toolbox slots'
+     * backing handler (every ThESlot accessor already no-ops safely on that) the moment the player
+     * no longer carries the exact Network Tool stack the toolbox was built from. Runs on both sides
+     * independently since player.inventory is already known locally on each.
+     */
+    private void validateToolbox() {
+        if (this.toolboxSlots.isEmpty()) return;
+        for (int i = 0; i < this.player.inventory.getSizeInventory(); i++) {
+            if (this.player.inventory.getStackInSlot(i) == this.toolboxStack) return;
+        }
+        for (ThESlot slot : this.toolboxSlots) slot.setItemHandler(null);
+        this.toolboxSlots.clear();
+        this.toolbox = null;
     }
 
     public boolean hasToolbox() {
+        this.validateToolbox();
         return this.toolbox != null;
+    }
+
+    @Override
+    public void detectAndSendChanges() {
+        this.validateToolbox();
+        super.detectAndSendChanges();
     }
 
     public IItemHandler getInventory(String name) {
