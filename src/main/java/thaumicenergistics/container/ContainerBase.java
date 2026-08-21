@@ -166,8 +166,7 @@ public abstract class ContainerBase extends Container {
         }
         if (!(this instanceof ContainerBaseTerminal) && clickType == ClickType.QUICK_MOVE) {
             if (slot instanceof SlotUpgrade || slot instanceof SlotKnowledgeCore)
-                ItemHandlerUtil.quickMoveSlot(
-                        new InvWrapper(this.player.inventory), slot, false, true);
+                this.quickMoveDedicatedSlotOut(slot);
             else handleQuickMove(slot, slot.getStack());
             return ItemStack.EMPTY;
         }
@@ -175,6 +174,15 @@ public abstract class ContainerBase extends Container {
     }
 
     protected void handleQuickMove(Slot slot, ItemStack itemStack) {}
+
+    /**
+     * Shift-click OUT for a dedicated single-item slot (upgrade card, knowledge core): sends the
+     * stack to the player inventory. Subclasses with an additional preferred destination (e.g. the
+     * Arcane Assembler's Network Tool toolbox) should override this to try that first.
+     */
+    protected void quickMoveDedicatedSlotOut(Slot slot) {
+        ItemHandlerUtil.quickMoveSlot(new InvWrapper(this.player.inventory), slot, false, true);
+    }
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {

@@ -140,6 +140,17 @@ public class ContainerArcaneAssembler extends ContainerBase {
         return this.toolbox != null;
     }
 
+    /**
+     * Prefer stashing a shift-clicked upgrade card in the Network Tool toolbox, if present, before
+     * falling back to the player inventory.
+     */
+    @Override
+    protected void quickMoveDedicatedSlotOut(Slot slot) {
+        if (this.hasToolbox())
+            ItemHandlerUtil.quickMoveSlot(this.toolbox.getInventory(), slot, false);
+        super.quickMoveDedicatedSlotOut(slot);
+    }
+
     @Override
     public void detectAndSendChanges() {
         this.validateToolbox();
