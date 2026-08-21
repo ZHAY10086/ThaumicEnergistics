@@ -1,3 +1,45 @@
+# 2026/08/21 - 2.6.0
+
+## Features
+
+* Knowledge cores can be swapped directly from their slot while holding another core on the cursor
+* Knowledge core tooltip now shows which recipes are stored in it
+* Green hint overlay on valid destination slots for knowledge cores (and armor, on the Arcane
+  Assembler) when shift-clicking
+* Carrying an AE2 Network Tool while using the Arcane Assembler surfaces its 3x3 upgrade-card
+  toolbox directly in the GUI, including auto in/out of Charging Cards; shift-clicking a card out of
+  the Assembler now prefers stashing it there before falling back to your inventory
+* Memory card support for saving/loading device configuration
+* All essentia GUIs can ghost JEI recipes and drag aspects in from JEI; added a fully-charged
+  wireless terminal to JEI
+* Wireless Essentia Terminal can charge from any Forge-energy-capable device, not just AE2 chargers;
+  displays durability and has a new icon
+
+## Bugs
+
+* Fixed a crash viewing the Essentia Interface research page in the Thaumonomicon
+* Fixed the wireless Essentia Terminal always appearing powered/active client-side regardless of
+  actual power or wireless range
+* Fixed two item duplication bugs around essentia cell disassembly
+* Fixed essentia amounts truncating at Integer.MAX_VALUE, showing wrong numbers on the terminal for
+  large networks; storage/power now scale with cell size like base AE2
+* Fixed the Arcane Assembler's Network Tool toolbox operating against a stale, detached tool after
+  it moved elsewhere in inventory
+* Fixed a shift-click hint highlighting a slot that shift-clicking an occupied dedicated slot
+  (upgrade card, knowledge core) can never actually move the item into
+* Fixed shift-clicking knowledge cores not always landing in the correct slot
+* Fixed the wireless terminal's re-equip/bob animation firing on every NBT change instead of only
+  real item changes
+* Fixed the wireless terminal incorrectly graying out as unpowered
+* Fixed orientation of two essentia items
+* Fixed the level emitter's unconfigured-route algorithm and GUI cropping unused elements
+  incorrectly
+
+## Misc
+
+* AEEssentiaStack equals ()/hashCode () correctness fixes
+* Internal cleanup (dead code removal, i18n string extraction) and a spelling fix
+
 # 2026/07/12 - 2.5.2
 
 ## Misc
