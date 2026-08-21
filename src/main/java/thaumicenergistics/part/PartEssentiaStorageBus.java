@@ -289,13 +289,18 @@ public class PartEssentiaStorageBus extends PartSharedEssentiaBus
 
     @Override
     public boolean onActivate(EntityPlayer player, EnumHand hand, Vec3d vec3d) {
+        if (this.useMemoryCard(player, hand)) {
+            return true;
+        }
         if ((player.isSneaking()
-                && AEUtil.isWrench(player.getHeldItem(hand), player, this.getTile().getPos())))
+                && AEUtil.isWrench(player.getHeldItem(hand), player, this.getTile().getPos()))) {
             return false;
+        }
 
-        if (ForgeUtil.isServer())
+        if (ForgeUtil.isServer()) {
             GuiHandler.openGUI(
                     ModGUIs.ESSENTIA_STORAGE_BUS, player, this.hostTile.getPos(), this.side);
+        }
 
         return true;
     }

@@ -4,6 +4,7 @@ import appeng.api.config.FuzzyMode;
 import appeng.api.storage.ICellWorkbenchItem;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -30,9 +31,10 @@ public class ItemCreativeEssentiaCell extends ItemBase implements ICellWorkbench
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void addInformation(
             ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-        tooltip.add("Contains all types of essentia");
+        tooltip.add(I18n.format("tooltip.thaumicenergistics.essentia_cell_creative.description"));
     }
 
     @Override

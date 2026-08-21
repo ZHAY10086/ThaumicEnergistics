@@ -4,6 +4,8 @@ import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.config.PowerMultiplier;
 import appeng.api.implementations.items.IAEWrench;
+import appeng.api.implementations.items.IMemoryCard;
+import appeng.api.implementations.items.MemoryCardMessages;
 import appeng.api.networking.energy.IEnergySource;
 import appeng.api.networking.security.IActionSource;
 import appeng.api.storage.IMEInventory;
@@ -23,6 +25,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -37,6 +40,8 @@ import thaumicenergistics.integration.appeng.AEEssentiaStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * @author BrockWS
@@ -117,8 +122,10 @@ public class AEUtil {
             toAdd = Math.min((long) ((availablePower * energyFactor) + 0.9), toAdd);
         }
 
-        if (toAdd < 1) // We either cannot store one item or don't have enough energy too
-        return input;
+        // We either cannot store one item or don't have enough energy too
+        if (toAdd < 1) {
+            return input;
+        }
 
         if (mode == Actionable.SIMULATE) {
             T s = input.copy().setStackSize(input.getStackSize() - toAdd);
@@ -128,8 +135,10 @@ public class AEUtil {
         if (energy != null)
             energy.extractAEPower(
                     toAdd / energyFactor, Actionable.MODULATE, PowerMultiplier.CONFIG);
-        if (input.getStackSize() == toAdd) // We have enough power to add everything
-        return inv.injectItems(input, Actionable.MODULATE, src);
+        // We have enough power to add everything
+        if (input.getStackSize() == toAdd) {
+            return inv.injectItems(input, Actionable.MODULATE, src);
+        }
 
         T split = input.copy();
         input.setStackSize(toAdd);
@@ -166,8 +175,10 @@ public class AEUtil {
 
         T canExtract = inv.extractItems(input.copy(), Actionable.SIMULATE, src);
 
-        if (canExtract == null) // There is no item
-        return null;
+        // There is no item
+        if (canExtract == null) {
+            return null;
+        }
 
         long toExtract = canExtract.getStackSize();
 
@@ -202,15 +213,11 @@ public class AEUtil {
                 inv, AEEssentiaStack.fromEssentiaStack(new EssentiaStack(aspect, 1)));
     }
 
-    public static IAEEssentiaStack getAEStackFromAspect(Aspect aspect, int amount) {
+    public static IAEEssentiaStack getAEStackFromAspect(Aspect aspect, long amount) {
         return AEApi.instance()
                 .storage()
                 .getStorageChannel(IEssentiaStorageChannel.class)
                 .createStack(new EssentiaStack(aspect, amount));
-    }
-
-    public static IAEEssentiaStack getAEStackFromAspect(Aspect aspect) {
-        return AEUtil.getAEStackFromAspect(aspect, Integer.MAX_VALUE);
     }
 
     public static <T extends IAEStack<T>, C extends IStorageChannel<T>> C getStorageChannel(
@@ -305,5 +312,33 @@ public class AEUtil {
             if (wrenchInterface.isInstance(item)) return true;
         }
         return false;
+    }
+
+    /**
+     * Shared sneak-to-save / name-match-to-load / mismatch-notify sequence for a memory card used
+     * on a machine, used by both AE2 cable-bus Parts ({@link thaumicenergistics.part.PartBase}) and
+     * plain TileEntities that aren't Parts (e.g. {@link
+     * thaumicenergistics.tile.TileEssentiaInterface}), which otherwise have no shared base class to
+     * hang this on. {@code download} may return null to signal "nothing to save."
+     */
+    public static void useMemoryCard(
+            EntityPlayer player,
+            IMemoryCard card,
+            ItemStack heldCard,
+            String settingsName,
+            Supplier<NBTTagCompound> download,
+            Consumer<NBTTagCompound> upload) {
+        if (player.isSneaking()) {
+            NBTTagCompound data = download.get();
+            if (data != null) {
+                card.setMemoryCardContents(heldCard, settingsName, data);
+                card.notifyUser(player, MemoryCardMessages.SETTINGS_SAVED);
+            }
+        } else if (settingsName.equals(card.getSettingsName(heldCard))) {
+            upload.accept(card.getData(heldCard));
+            card.notifyUser(player, MemoryCardMessages.SETTINGS_LOADED);
+        } else {
+            card.notifyUser(player, MemoryCardMessages.INVALID_MACHINE);
+        }
     }
 }

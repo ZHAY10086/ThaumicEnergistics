@@ -33,6 +33,7 @@ import thaumicenergistics.container.slot.ThESlot;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -56,8 +57,11 @@ public abstract class GuiBase extends GuiContainer {
         this.drawDefaultBackground();
         GlStateManager.color(1.0F, 1.0F, 1.0f, 1.0F);
         super.drawScreen(mouseX, mouseY, partialTicks);
+        this.drawSlotHints();
         this.renderHoveredToolTip(mouseX, mouseY);
     }
+
+    protected void drawSlotHints() {}
 
     @Override
     public void drawSlot(Slot slot) {
@@ -99,6 +103,28 @@ public abstract class GuiBase extends GuiContainer {
             }
         }
         super.drawSlot(slot);
+    }
+
+    protected void drawDedicatedSlotHint(
+            Class<? extends Slot> destSlotType, Predicate<ItemStack> accepts) {
+        if (this.hoveredSlot == null
+                || !this.hoveredSlot.getHasStack()
+                || destSlotType.isInstance(this.hoveredSlot)
+                || !accepts.test(this.hoveredSlot.getStack())) return;
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
+        for (Slot slot : this.inventorySlots.inventorySlots) {
+            if (!destSlotType.isInstance(slot) || slot.getHasStack() || slot == this.hoveredSlot) {
+                continue;
+            }
+            if (!slot.isItemValid(this.hoveredSlot.getStack())) {
+                continue;
+            }
+            int x = this.getGuiLeft() + slot.xPos;
+            int y = this.getGuiTop() + slot.yPos;
+            drawRect(x, y, x + 16, y + 16, 0x9922FF22);
+        }
+        GlStateManager.enableDepth();
     }
 
     @Override

@@ -14,15 +14,18 @@ import baubles.api.IBauble;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -134,6 +137,17 @@ public class ItemWirelessEssentiaTerminal extends ItemBase
                         : ThEApi.instance().lang().deviceUnlinked().getLocalizedKey());
     }
 
+    @Override
+    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
+        if (!this.isInCreativeTab(tab)) return;
+        // Empty terminal.
+        items.add(new ItemStack(this));
+        // Fully charged terminal
+        ItemStack charged = new ItemStack(this);
+        this.setCurrentPower(charged, this.getAEMaxPower(charged));
+        items.add(charged);
+    }
+
     @Optional.Method(modid = "baubles")
     @Override
     public BaubleType getBaubleType(ItemStack itemStack) {
@@ -219,5 +233,28 @@ public class ItemWirelessEssentiaTerminal extends ItemBase
         NBTTagCompound tag = stack.hasTagCompound() ? stack.getTagCompound() : new NBTTagCompound();
         tag.setDouble(TAG_POWER, power);
         stack.setTagCompound(tag);
+    }
+
+    @Nullable
+    @Override
+    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound nbt) {
+        return new ForgeEnergyItemWrapper(stack, this);
+    }
+
+    @Override
+    public boolean showDurabilityBar(ItemStack stack) {
+        return this.getAECurrentPower(stack) < this.getAEMaxPower(stack);
+    }
+
+    @Override
+    public double getDurabilityForDisplay(ItemStack stack) {
+        double max = this.getAEMaxPower(stack);
+        return max <= 0 ? 0 : 1.0 - (this.getAECurrentPower(stack) / max);
+    }
+
+    @Override
+    public boolean shouldCauseReequipAnimation(
+            ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        return slotChanged || oldStack.getItem() != newStack.getItem();
     }
 }

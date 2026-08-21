@@ -28,7 +28,7 @@ item.thaumicenergistics.essentia_terminal.name=Терминал эссенции
 item.thaumicenergistics.wireless_essentia_terminal.name=Беспроводной терминал эссенции
 item.thaumicenergistics.arcane_terminal.name=Мистический терминал создания
 
-item.thaumicenergistics.upgrade_arcane.name=Улучшение для Мистического Заряжателя
+item.thaumicenergistics.upgrade_arcane.name=Карта Мистического Заряжания
 
 # Подсказки
 tooltip.thaumicenergistics.wip=РАБОТАЮ НАД ЭТИМ, НЕ ИСПОЛЬЗОВАТЬ
@@ -42,6 +42,7 @@ tooltip.thaumicenergistics.device_out_of_range=Терминал вне зоны 
 tooltip.thaumicenergistics.device_linked=Привязан
 tooltip.thaumicenergistics.device_unlinked=Не привязан
 tooltip.thaumicenergistics.stored_energy=Накопленная энергия
+tooltip.thaumicenergistics.essentia_cell_creative.description=Содержит все виды эссенции
 
 # GUI
 gui.thaumicenergistics.essentia_import_bus=МЭ Шина импорта эссенции

@@ -119,13 +119,12 @@ public class PartEssentiaExportBus extends PartSharedEssentiaBus {
                                 extracted.getAspect(), (int) extracted.getStackSize());
             } catch (NullPointerException ignored) {
                 if (!reportedWarning)
-                    ThELog.warn(
+                    ThELog.debug(
                             "container.addToContainer threw a NullPointerException. Thaumcraft Bug. Nividica/ThaumicEnergistics#361. Remove EssentiaExportBus from {}",
                             this.hostTile != null ? this.hostTile.getPos() : connectedTE.getPos());
                 reportedWarning = true;
                 return TickRateModulation.IDLE;
             }
-            reportedWarning = false;
             // Couldn't contain it all
             extracted.decStackSize(notAdded);
 
@@ -152,6 +151,9 @@ public class PartEssentiaExportBus extends PartSharedEssentiaBus {
 
     @Override
     public boolean onActivate(EntityPlayer player, EnumHand hand, Vec3d vec3d) {
+        if (this.useMemoryCard(player, hand)) {
+            return true;
+        }
         if ((player.isSneaking()
                 && AEUtil.isWrench(player.getHeldItem(hand), player, this.getTile().getPos())))
             return false;

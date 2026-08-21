@@ -32,7 +32,7 @@ public class GuiEssentiaLevelEmitter extends GuiConfigurable {
 
     public GuiEssentiaLevelEmitter(ContainerEssentiaLevelEmitter container) {
         super(container);
-        this.xSize = 211;
+        this.xSize = 177;
         this.ySize = 184;
     }
 

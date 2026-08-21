@@ -5,6 +5,7 @@ import appeng.api.config.Settings;
 import appeng.api.config.Upgrades;
 import appeng.api.implementations.IPowerChannelState;
 import appeng.api.implementations.IUpgradeableHost;
+import appeng.api.implementations.items.IMemoryCard;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.events.MENetworkBootingStatusChange;
 import appeng.api.networking.events.MENetworkEventSubscribe;
@@ -42,6 +43,7 @@ import thaumicenergistics.integration.appeng.grid.ThEGridBlock;
 import thaumicenergistics.integration.appeng.util.ThEActionSource;
 import thaumicenergistics.integration.appeng.util.ThEConfigManager;
 import thaumicenergistics.item.ItemPartBase;
+import thaumicenergistics.util.AEUtil;
 import thaumicenergistics.util.ForgeUtil;
 import thaumicenergistics.util.IThEGridNodeBlock;
 import thaumicenergistics.util.IThEOwnable;
@@ -252,6 +254,27 @@ public abstract class PartBase
     public boolean onActivate(EntityPlayer entityPlayer, EnumHand enumHand, Vec3d vec3d) {
         return false;
     }
+
+    protected boolean useMemoryCard(EntityPlayer player, EnumHand hand) {
+        ItemStack held = player.getHeldItem(hand);
+        if (held.isEmpty() || !(held.getItem() instanceof IMemoryCard)) return false;
+        // The server owns the copy/paste. Both sides swallow the click so the GUI doesn't open
+        if (ForgeUtil.isClient()) return true;
+        AEUtil.useMemoryCard(
+                player,
+                (IMemoryCard) held.getItem(),
+                held,
+                this.getItemStack(PartItemStack.NETWORK).getTranslationKey(),
+                this::downloadMemoryCardSettings,
+                this::uploadMemoryCardSettings);
+        return true;
+    }
+
+    protected NBTTagCompound downloadMemoryCardSettings() {
+        return null;
+    }
+
+    protected void uploadMemoryCardSettings(NBTTagCompound data) {}
 
     @Override
     public boolean onShiftActivate(EntityPlayer entityPlayer, EnumHand enumHand, Vec3d vec3d) {

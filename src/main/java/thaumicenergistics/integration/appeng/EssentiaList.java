@@ -104,9 +104,9 @@ public class EssentiaList implements IItemList<IAEEssentiaStack> {
 
     @Override
     public Collection<IAEEssentiaStack> findFuzzy(IAEEssentiaStack stack, FuzzyMode mode) {
-        return stack == null
-                ? Collections.emptyList()
-                : Collections.singletonList(this.findPrecise(stack));
+        if (stack == null) return Collections.emptyList();
+        IAEEssentiaStack found = this.findPrecise(stack);
+        return found == null ? Collections.emptyList() : Collections.singletonList(found);
     }
 
     @Override

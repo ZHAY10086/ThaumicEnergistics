@@ -30,7 +30,7 @@ item.thaumicenergistics.wireless_essentia_terminal.name=无线源质终端
 item.thaumicenergistics.arcane_terminal.name=奥术合成终端
 item.thaumicenergistics.arcane_inscriber.name=奥术记录仪
 
-item.thaumicenergistics.upgrade_arcane.name=奥术充能升级
+item.thaumicenergistics.upgrade_arcane.name=奥术充能卡
 item.thaumicenergistics.knowledge_core.name=知识核心
 item.thaumicenergistics.blank_knowledge_core.name=空白知识核心
 
@@ -52,10 +52,8 @@ tooltip.thaumicenergistics.arcane_assembler.busy=状态：繁忙
 tooltip.thaumicenergistics.arcane_assembler.progress=正在处理：
 tooltip.thaumicenergistics.arcane_assembler.no_aspect=错误：缺少源质
 tooltip.thaumicenergistics.arcane_assembler.no_vis=错误：缺少Vis
-tooltip.thaumicenergistics.essentia_interface.side_input=[ThE-DEBUG] 源质接口 [%s]：输入（任意源质）
-tooltip.thaumicenergistics.essentia_interface.side_output=[ThE-DEBUG] 源质接口 [%s]：输出（%s）
-tooltip.thaumicenergistics.essentia_interface.side_disabled=[ThE-DEBUG] 源质接口 [%s]：已禁用
-tooltip.thaumicenergistics.essentia_interface.multi_aspect_item=[ThE-DEBUG] 该物品拥有多种要素——请使用单一要素物品来配置该面。
+tooltip.thaumicenergistics.essentia_interface.multi_aspect_item=该物品拥有多种要素——请使用单一要素物品来配置该面。
+tooltip.thaumicenergistics.essentia_cell_creative.description=包含所有类型的源质
 
 # GUI
 gui.thaumicenergistics.essentia_import_bus=ME源质输入总线

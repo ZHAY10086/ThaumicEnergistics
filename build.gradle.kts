@@ -189,6 +189,50 @@ dependencies {
     )
 
     // Testing mods
+    // Thermal Expansion FE charger for wireless essentia terminal charging tests.
+    // Runtime-only; requires the full CoFH/Thermal dependency chain to load.
+    runtimeOnly(
+        rfg.deobf(
+            libs.curse.redstoneFlux
+                .get()
+                .toString(),
+        ),
+    )
+    runtimeOnly(
+        rfg.deobf(
+            libs.curse.cofhCore
+                .get()
+                .toString(),
+        ),
+    )
+    runtimeOnly(
+        rfg.deobf(
+            libs.curse.cofhWorld
+                .get()
+                .toString(),
+        ),
+    )
+    runtimeOnly(
+        rfg.deobf(
+            libs.curse.thermalFoundation
+                .get()
+                .toString(),
+        ),
+    )
+    runtimeOnly(
+        rfg.deobf(
+            libs.curse.thermalExpansion
+                .get()
+                .toString(),
+        ),
+    )
+    runtimeOnly(
+        rfg.deobf(
+            libs.curse.codeChickenLib
+                .get()
+                .toString(),
+        ),
+    )
     // Unsure if needed in future
     //    api("com.brandon3055.brandonscore:BrandonsCore:${version_bc}:universal")
     //    api("curse.maven:codechickenlib:${version_ccl}")

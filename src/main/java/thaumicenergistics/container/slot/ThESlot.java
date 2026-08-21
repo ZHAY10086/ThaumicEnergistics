@@ -43,7 +43,15 @@ public class ThESlot extends Slot {
 
     @Override
     public boolean isItemValid(ItemStack stack) {
+        if (this.itemHandler == null) {
+            return false;
+        }
         return this.itemHandler.isItemValid(this.getSlotIndex(), stack);
+    }
+
+    /** Detaches (or reattaches) this slot's backing handler. */
+    public void setItemHandler(IItemHandler handler) {
+        this.itemHandler = handler;
     }
 
     @Override

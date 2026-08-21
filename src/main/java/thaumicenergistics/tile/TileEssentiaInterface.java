@@ -16,13 +16,11 @@ import appeng.api.storage.IMEMonitor;
 import appeng.me.GridAccessException;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
 
 import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.api.aspects.Aspect;
@@ -34,9 +32,7 @@ import thaumicenergistics.integration.appeng.grid.GridUtil;
 import thaumicenergistics.integration.appeng.grid.IEssentiaStorageMonitorable;
 import thaumicenergistics.util.AEUtil;
 import thaumicenergistics.util.ForgeUtil;
-import thaumicenergistics.util.ThELog;
 
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -124,44 +120,28 @@ public class TileEssentiaInterface extends TileNetwork
         return this.outputAspects.get(side);
     }
 
-    public void setSideInput(EnumFacing side, @Nullable EntityPlayer player) {
+    public void setSideInput(EnumFacing side) {
         this.sideModes.put(side, SideMode.INPUT);
         this.outputAspects.remove(side);
         this.markDirty();
         this.notifyNeighborOfConnectivityChange();
         this.updateTickingState();
-        this.notifyModeChange(
-                side,
-                player,
-                "tooltip.thaumicenergistics.essentia_interface.side_input",
-                side.getName());
     }
 
-    public void setSideOutput(EnumFacing side, Aspect aspect, @Nullable EntityPlayer player) {
+    public void setSideOutput(EnumFacing side, Aspect aspect) {
         this.sideModes.put(side, SideMode.OUTPUT);
         this.outputAspects.put(side, aspect);
         this.markDirty();
         this.notifyNeighborOfConnectivityChange();
         this.updateTickingState();
-        this.notifyModeChange(
-                side,
-                player,
-                "tooltip.thaumicenergistics.essentia_interface.side_output",
-                side.getName(),
-                aspect.getName());
     }
 
-    public void disableSide(EnumFacing side, @Nullable EntityPlayer player) {
+    public void disableSide(EnumFacing side) {
         this.sideModes.remove(side);
         this.outputAspects.remove(side);
         this.markDirty();
         this.notifyNeighborOfConnectivityChange();
         this.updateTickingState();
-        this.notifyModeChange(
-                side,
-                player,
-                "tooltip.thaumicenergistics.essentia_interface.side_disabled",
-                side.getName());
     }
 
     /**
@@ -212,13 +192,6 @@ public class TileEssentiaInterface extends TileNetwork
         }
     }
 
-    // TODO: this is a placeholder debug readout until per-side graphics are added -- see #47.
-    private void notifyModeChange(
-            EnumFacing side, @Nullable EntityPlayer player, String langKey, Object... args) {
-        if (player != null) player.sendMessage(new TextComponentTranslation(langKey, args));
-        ThELog.debug("Essentia Interface [" + side + "]: " + langKey + " " + Arrays.toString(args));
-    }
-
     // ---- Side-config (de)serialization, shared between world-save NBT and the live client-sync
     // path (getUpdateTag/handleUpdateTag/getUpdatePacket, already used by TileNetwork for
     // powered/active) -- both need the same data, just via different TileEntity hooks.
@@ -260,6 +233,24 @@ public class TileEssentiaInterface extends TileNetwork
             list.appendTag(sideTag);
         }
         return list;
+    }
+
+    public NBTTagCompound getMemoryCardData() {
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setTag("sideConfig", this.writeSideConfig());
+        return tag;
+    }
+
+    public void applyMemoryCardData(NBTTagCompound data) {
+        if (data == null) return;
+        this.readSideConfig(data);
+        this.markDirty();
+        this.notifyNeighborOfConnectivityChange();
+        this.updateTickingState();
+        if (this.world != null && !this.world.isRemote) {
+            IBlockState state = this.world.getBlockState(this.pos);
+            this.world.notifyBlockUpdate(this.pos, state, state, 3);
+        }
     }
 
     private void readSideConfig(NBTTagCompound compound) {

@@ -1,5 +1,7 @@
 package thaumicenergistics;
 
+import appeng.api.implementations.items.IMemoryCard;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -54,6 +56,7 @@ import thaumicenergistics.item.ItemPartBase;
 import thaumicenergistics.network.PacketHandler;
 import thaumicenergistics.tile.TileArcaneAssembler;
 import thaumicenergistics.tile.TileEssentiaInterface;
+import thaumicenergistics.util.AEUtil;
 import thaumicenergistics.util.ForgeUtil;
 
 /**
@@ -205,10 +208,23 @@ public class ThaumicEnergistics {
         EntityPlayer player = event.getEntityPlayer();
         ItemStack heldItem = event.getItemStack();
 
+        if (heldItem.getItem() instanceof IMemoryCard) {
+            AEUtil.useMemoryCard(
+                    player,
+                    (IMemoryCard) heldItem.getItem(),
+                    heldItem,
+                    tile.getBlockType().getTranslationKey(),
+                    tile::getMemoryCardData,
+                    tile::applyMemoryCardData);
+            event.setCancellationResult(EnumActionResult.SUCCESS);
+            event.setCanceled(true);
+            return;
+        }
+
         // If we have a caster gauntlet then configure the sides
         if (heldItem.getItem() instanceof ItemCaster) {
-            if (player.isSneaking()) tile.disableSide(side, player);
-            else tile.setSideInput(side, player);
+            if (player.isSneaking()) tile.disableSide(side);
+            else tile.setSideInput(side);
             event.setCancellationResult(EnumActionResult.SUCCESS);
             event.setCanceled(true);
             // Per Forge's own documented contract on PlayerInteractEvent.RightClickBlock: "If ...
@@ -227,8 +243,8 @@ public class ThaumicEnergistics {
         if (heldItem.getItem() instanceof IEssentiaContainerItem) {
             AspectList aspects = ((IEssentiaContainerItem) heldItem.getItem()).getAspects(heldItem);
             if (aspects != null && aspects.size() == 1) {
-                if (player.isSneaking()) tile.disableSide(side, player);
-                else tile.setSideOutput(side, aspects.getAspects()[0], player);
+                if (player.isSneaking()) tile.disableSide(side);
+                else tile.setSideOutput(side, aspects.getAspects()[0]);
                 event.setCancellationResult(EnumActionResult.SUCCESS);
                 event.setCanceled(true);
             } else if (aspects != null && aspects.size() > 1) {

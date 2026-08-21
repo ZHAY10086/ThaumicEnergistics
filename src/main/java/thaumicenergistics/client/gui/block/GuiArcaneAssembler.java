@@ -13,6 +13,9 @@ import thaumcraft.codechicken.lib.math.MathHelper;
 import thaumicenergistics.api.ThEApi;
 import thaumicenergistics.client.gui.GuiBase;
 import thaumicenergistics.container.block.ContainerArcaneAssembler;
+import thaumicenergistics.container.slot.SlotKnowledgeCore;
+import thaumicenergistics.container.slot.SlotUpgrade;
+import thaumicenergistics.item.ItemKnowledgeCore;
 import thaumicenergistics.network.PacketHandler;
 import thaumicenergistics.network.packets.PacketAssemblerGUIUpdateRequest;
 import thaumicenergistics.network.packets.PacketSubscribe;
@@ -34,6 +37,8 @@ public class GuiArcaneAssembler extends GuiBase {
             new ResourceLocation(Reference.MOD_ID, "textures/gui/arcane_assembler/active.png");
     private static final ResourceLocation ASPECTS =
             new ResourceLocation(Reference.MOD_ID, "textures/gui/arcane_assembler/aspects.png");
+    private static final ResourceLocation TOOLBOX =
+            new ResourceLocation("appliedenergistics2", "textures/guis/toolbox.png");
     private static final int WIDTH = 210;
     private static final int HEIGHT = 231;
     private final ContainerArcaneAssembler container;
@@ -64,9 +69,16 @@ public class GuiArcaneAssembler extends GuiBase {
     @Override
     public void initGui() {
         PacketHandler.sendToServer(new PacketAssemblerGUIUpdateRequest(this.container.getTE()));
-        this.xSize = WIDTH;
+        this.xSize = this.container.hasToolbox() ? WIDTH + 39 : WIDTH;
         this.ySize = HEIGHT;
         super.initGui();
+    }
+
+    @Override
+    protected void drawSlotHints() {
+        this.drawDedicatedSlotHint(
+                SlotKnowledgeCore.class, s -> s.getItem() instanceof ItemKnowledgeCore);
+        this.drawDedicatedSlotHint(SlotUpgrade.class, s -> true);
     }
 
     @Override
@@ -103,28 +115,21 @@ public class GuiArcaneAssembler extends GuiBase {
         if (this.enAlpha < 1.0F) {
             this.mc.getTextureManager().bindTexture(BACKGROUND_INACTIVE);
             drawModalRectWithCustomSizedTexture(
-                    this.guiLeft,
-                    this.guiTop,
-                    0,
-                    0,
-                    this.xSize,
-                    this.ySize,
-                    this.xSize,
-                    this.ySize);
+                    this.guiLeft, this.guiTop, 0, 0, WIDTH, this.ySize, WIDTH, this.ySize);
         }
         if (this.enAlpha > 0.0F) {
             GL11.glColor4f(1.0F, 1.0F, 1.0F, this.enAlpha);
             this.mc.getTextureManager().bindTexture(BACKGROUND_ACTIVE);
             drawModalRectWithCustomSizedTexture(
-                    this.guiLeft,
-                    this.guiTop,
-                    0,
-                    0,
-                    this.xSize,
-                    this.ySize,
-                    this.xSize,
-                    this.ySize);
+                    this.guiLeft, this.guiTop, 0, 0, WIDTH, this.ySize, WIDTH, this.ySize);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        }
+
+        // Network Tool toolbox panel (3x3 upgrade slots) blitted from AE2's toolbox.png
+        if (this.container.hasToolbox()) {
+            this.mc.getTextureManager().bindTexture(TOOLBOX);
+            drawModalRectWithCustomSizedTexture(
+                    this.guiLeft + 179, this.guiTop + 142, 55, 12, 70, 70, 256, 256);
         }
 
         this.mc.getTextureManager().bindTexture(ASPECTS);

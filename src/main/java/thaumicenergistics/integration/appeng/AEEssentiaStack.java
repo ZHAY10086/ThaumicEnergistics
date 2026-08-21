@@ -1,7 +1,5 @@
 package thaumicenergistics.integration.appeng;
 
-import static java.lang.Math.min;
-
 import appeng.api.AEApi;
 import appeng.api.config.FuzzyMode;
 import appeng.api.storage.IStorageChannel;
@@ -19,6 +17,8 @@ import thaumicenergistics.api.ThEApi;
 import thaumicenergistics.api.storage.IAEEssentiaStack;
 import thaumicenergistics.api.storage.IEssentiaStorageChannel;
 import thaumicenergistics.item.ItemDummyAspect;
+
+import java.util.Locale;
 
 /**
  * @author BrockWS
@@ -39,15 +39,18 @@ public class AEEssentiaStack implements IAEEssentiaStack, Comparable<AEEssentiaS
         this.setStackSize(amount);
         this.setCraftable(false);
         this.setCountRequestable(0);
-        this.hash = this.aspect.hashCode();
+        // Derive the hash from the (normalized) aspect tag so it's consistent with the
+        // case-insensitive tag equality and stable across JVM runs - rather than the Aspect's
+        // identity hash, which Thaumcraft leaves as Object's and which changes every run.
+        this.hash = this.aspect.getTag().toLowerCase(Locale.ROOT).hashCode();
     }
 
     private AEEssentiaStack(AEEssentiaStack stack) {
         this.aspect = stack.getAspect();
         if (this.aspect == null) throw new IllegalArgumentException("Aspect is null");
         this.setStackSize(stack.getStackSize());
-        this.setCraftable(false);
-        this.setCountRequestable(0);
+        this.setCraftable(stack.isCraftable());
+        this.setCountRequestable(stack.getCountRequestable());
         this.hash = stack.hash;
     }
 
@@ -60,10 +63,9 @@ public class AEEssentiaStack implements IAEEssentiaStack, Comparable<AEEssentiaS
         EssentiaStack stack = EssentiaStack.readFromNBT(t);
         if (stack == null) return null;
         AEEssentiaStack ae = AEEssentiaStack.fromEssentiaStack(stack);
-        ae.setStackSize(t.getLong("AspectAmount"));
         ae.setCountRequestable(t.getLong("Req"));
         ae.setCraftable(t.getBoolean("Craft"));
-        return new AEEssentiaStack(stack.getAspect(), stack.getAmount());
+        return ae;
     }
 
     public static IAEEssentiaStack fromPacket(ByteBuf buf) {
@@ -120,7 +122,7 @@ public class AEEssentiaStack implements IAEEssentiaStack, Comparable<AEEssentiaS
 
     @Override
     public void incStackSize(long l) {
-        this.setStackSize(min(Integer.MAX_VALUE, this.getStackSize() + l));
+        this.setStackSize(this.getStackSize() + l);
     }
 
     @Override
@@ -145,7 +147,7 @@ public class AEEssentiaStack implements IAEEssentiaStack, Comparable<AEEssentiaS
 
     @Override
     public EssentiaStack getStack() {
-        return new EssentiaStack(this.getAspect(), (int) min(Integer.MAX_VALUE, this.stackSize));
+        return new EssentiaStack(this.getAspect(), this.stackSize);
     }
 
     @Override
@@ -159,7 +161,6 @@ public class AEEssentiaStack implements IAEEssentiaStack, Comparable<AEEssentiaS
     @Override
     public void writeToNBT(NBTTagCompound t) {
         t.setString("Aspect", this.getAspect().getTag());
-        t.setByte("Count", (byte) 0);
         t.setLong("Amount", this.getStackSize());
         t.setLong("Req", this.getCountRequestable());
         t.setBoolean("Craft", this.isCraftable());
@@ -215,8 +216,7 @@ public class AEEssentiaStack implements IAEEssentiaStack, Comparable<AEEssentiaS
 
     @Override
     public int compareTo(AEEssentiaStack o) {
-        int diff = this.hashCode() - o.hashCode();
-        return Integer.compare(diff, 0);
+        return Integer.compare(this.hashCode(), o.hashCode());
     }
 
     @Override
@@ -226,18 +226,12 @@ public class AEEssentiaStack implements IAEEssentiaStack, Comparable<AEEssentiaS
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof AEEssentiaStack) {
-            return ((AEEssentiaStack) obj)
-                    .getAspect()
-                    .getTag()
-                    .equalsIgnoreCase(this.getAspect().getTag());
-        }
-        if (obj instanceof EssentiaStack) {
-            return ((EssentiaStack) obj)
-                    .getAspect()
-                    .getTag()
-                    .equalsIgnoreCase(this.getAspect().getTag());
-        }
-        return false;
+        if (this == obj) return true;
+        // Must not also match plain EssentiaStack: it never overrides equals(), so a cross-type
+        // match here would be asymmetric and violate the Object.equals contract.
+        if (!(obj instanceof AEEssentiaStack)) return false;
+        return this.getAspect()
+                .getTag()
+                .equalsIgnoreCase(((AEEssentiaStack) obj).getAspect().getTag());
     }
 }

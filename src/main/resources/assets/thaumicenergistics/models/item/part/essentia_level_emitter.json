@@ -19,54 +19,54 @@
         "north": {
           "texture": "#emitter",
           "uv": [
+            6,
             7,
-            7,
-            9,
+            10,
             11
           ]
         },
         "south": {
           "texture": "#emitter",
           "uv": [
+            6,
             7,
-            7,
-            9,
+            10,
             11
           ]
         },
         "east": {
           "texture": "#emitter",
           "uv": [
+            6,
             7,
-            7,
-            9,
+            10,
             11
           ]
         },
         "west": {
           "texture": "#emitter",
           "uv": [
+            6,
             7,
-            7,
-            9,
+            10,
             11
           ]
         },
         "up": {
           "texture": "#emitter",
           "uv": [
+            6,
             7,
-            7,
-            9,
+            10,
             9
           ]
         },
         "down": {
           "texture": "#emitter",
           "uv": [
-            7,
+            6,
             9,
-            9,
+            10,
             11
           ]
         }

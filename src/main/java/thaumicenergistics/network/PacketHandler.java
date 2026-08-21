@@ -80,6 +80,11 @@ public class PacketHandler {
                 PacketLevelEmitterValue.class,
                 PacketHandler.nextID(),
                 Side.CLIENT);
+        PacketHandler.INSTANCE.registerMessage(
+                PacketWirelessTerminalPowerUpdate.Handler.class,
+                PacketWirelessTerminalPowerUpdate.class,
+                PacketHandler.nextID(),
+                Side.CLIENT);
 
         PacketHandler.INSTANCE.registerMessage(
                 PacketUIAction.Handler.class,
