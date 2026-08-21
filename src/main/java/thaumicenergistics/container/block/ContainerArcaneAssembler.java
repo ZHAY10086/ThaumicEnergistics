@@ -65,20 +65,36 @@ public class ContainerArcaneAssembler extends ContainerBase {
      * the bottom-right (AE2's own layout), so cards can be accessed without leaving the assembler.
      */
     private void setupToolbox(EntityPlayer player) {
+        ItemStack stack = this.findNetworkTool(player);
+        if (stack.isEmpty()) return;
+        this.bindToolbox(stack, true);
+    }
+
+    private ItemStack findNetworkTool(EntityPlayer player) {
         for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
             ItemStack stack = player.inventory.getStackInSlot(i);
             if (AEApi.instance().definitions().items().networkTool().isSameAs(stack)
-                    && stack.getItem() instanceof IGuiItem) {
-                this.toolbox =
-                        (INetworkTool)
-                                ((IGuiItem) stack.getItem())
-                                        .getGuiObject(stack, this.TE.getWorld(), this.TE.getPos());
-                this.toolboxStack = stack;
-                break;
-            }
+                    && stack.getItem() instanceof IGuiItem) return stack;
         }
-        if (this.toolbox == null) return;
+        return ItemStack.EMPTY;
+    }
+
+    /**
+     * (Re)binds the toolbox to the given Network Tool stack. On first bind (createSlots) this also
+     * lays out the 9 slots; on a later rebind (a different stack now matches, e.g. after the
+     * original one merged/split) it just re-points the existing slots at the new handler.
+     */
+    private void bindToolbox(ItemStack stack, boolean createSlots) {
+        this.toolboxStack = stack;
+        this.toolbox =
+                (INetworkTool)
+                        ((IGuiItem) stack.getItem())
+                                .getGuiObject(stack, this.TE.getWorld(), this.TE.getPos());
         IItemHandler inv = this.toolbox.getInventory();
+        if (!createSlots) {
+            for (ThESlot slot : this.toolboxSlots) slot.setItemHandler(inv);
+            return;
+        }
         for (int v = 0; v < 3; v++)
             for (int u = 0; u < 3; u++) {
                 ThESlot slot =
@@ -100,19 +116,23 @@ public class ContainerArcaneAssembler extends ContainerBase {
     /**
      * Unlike AE2's own ContainerNetworkTool (which locks a specific inventory slot and closes
      * outright if it empties), the toolbox here is a bonus panel on top of an otherwise-valid
-     * Arcane Assembler session -- so instead of closing the whole GUI, detach the toolbox slots'
-     * backing handler (every ThESlot accessor already no-ops safely on that) the moment the player
-     * no longer carries the exact Network Tool stack the toolbox was built from. Runs on both sides
-     * independently since player.inventory is already known locally on each.
+     * Arcane Assembler session -- so instead of closing the whole GUI, re-resolve which Network
+     * Tool (if any) the player currently carries by item identity, same as the initial setup scan,
+     * rather than trusting a single frozen ItemStack reference (fragile to unrelated inventory
+     * churn). Detach the toolbox slots' backing handler (every ThESlot accessor already no-ops
+     * safely on that) only once no matching tool exists anywhere in the inventory at all. Runs on
+     * both sides independently since player.inventory is already known locally on each.
      */
     private void validateToolbox() {
         if (this.toolboxSlots.isEmpty()) return;
-        for (int i = 0; i < this.player.inventory.getSizeInventory(); i++) {
-            if (this.player.inventory.getStackInSlot(i) == this.toolboxStack) return;
+        ItemStack stack = this.findNetworkTool(this.player);
+        if (stack.isEmpty()) {
+            for (ThESlot slot : this.toolboxSlots) slot.setItemHandler(null);
+            this.toolboxSlots.clear();
+            this.toolbox = null;
+            return;
         }
-        for (ThESlot slot : this.toolboxSlots) slot.setItemHandler(null);
-        this.toolboxSlots.clear();
-        this.toolbox = null;
+        if (stack != this.toolboxStack) this.bindToolbox(stack, false);
     }
 
     public boolean hasToolbox() {

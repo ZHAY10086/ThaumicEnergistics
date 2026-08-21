@@ -1,7 +1,6 @@
 package thaumicenergistics;
 
 import appeng.api.implementations.items.IMemoryCard;
-import appeng.api.implementations.items.MemoryCardMessages;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -57,6 +56,7 @@ import thaumicenergistics.item.ItemPartBase;
 import thaumicenergistics.network.PacketHandler;
 import thaumicenergistics.tile.TileArcaneAssembler;
 import thaumicenergistics.tile.TileEssentiaInterface;
+import thaumicenergistics.util.AEUtil;
 import thaumicenergistics.util.ForgeUtil;
 
 /**
@@ -209,17 +209,13 @@ public class ThaumicEnergistics {
         ItemStack heldItem = event.getItemStack();
 
         if (heldItem.getItem() instanceof IMemoryCard) {
-            IMemoryCard card = (IMemoryCard) heldItem.getItem();
-            String name = tile.getBlockType().getTranslationKey();
-            if (player.isSneaking()) {
-                card.setMemoryCardContents(heldItem, name, tile.getMemoryCardData());
-                card.notifyUser(player, MemoryCardMessages.SETTINGS_SAVED);
-            } else if (name.equals(card.getSettingsName(heldItem))) {
-                tile.applyMemoryCardData(card.getData(heldItem));
-                card.notifyUser(player, MemoryCardMessages.SETTINGS_LOADED);
-            } else {
-                card.notifyUser(player, MemoryCardMessages.INVALID_MACHINE);
-            }
+            AEUtil.useMemoryCard(
+                    player,
+                    (IMemoryCard) heldItem.getItem(),
+                    heldItem,
+                    tile.getBlockType().getTranslationKey(),
+                    tile::getMemoryCardData,
+                    tile::applyMemoryCardData);
             event.setCancellationResult(EnumActionResult.SUCCESS);
             event.setCanceled(true);
             return;
