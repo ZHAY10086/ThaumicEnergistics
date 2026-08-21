@@ -4,6 +4,8 @@ import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.config.PowerMultiplier;
 import appeng.api.implementations.items.IAEWrench;
+import appeng.api.implementations.items.IMemoryCard;
+import appeng.api.implementations.items.MemoryCardMessages;
 import appeng.api.networking.energy.IEnergySource;
 import appeng.api.networking.security.IActionSource;
 import appeng.api.storage.IMEInventory;
@@ -23,6 +25,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -37,6 +40,8 @@ import thaumicenergistics.integration.appeng.AEEssentiaStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * @author BrockWS
@@ -307,5 +312,33 @@ public class AEUtil {
             if (wrenchInterface.isInstance(item)) return true;
         }
         return false;
+    }
+
+    /**
+     * Shared sneak-to-save / name-match-to-load / mismatch-notify sequence for a memory card used
+     * on a machine, used by both AE2 cable-bus Parts ({@link thaumicenergistics.part.PartBase}) and
+     * plain TileEntities that aren't Parts (e.g. {@link
+     * thaumicenergistics.tile.TileEssentiaInterface}), which otherwise have no shared base class to
+     * hang this on. {@code download} may return null to signal "nothing to save."
+     */
+    public static void useMemoryCard(
+            EntityPlayer player,
+            IMemoryCard card,
+            ItemStack heldCard,
+            String settingsName,
+            Supplier<NBTTagCompound> download,
+            Consumer<NBTTagCompound> upload) {
+        if (player.isSneaking()) {
+            NBTTagCompound data = download.get();
+            if (data != null) {
+                card.setMemoryCardContents(heldCard, settingsName, data);
+                card.notifyUser(player, MemoryCardMessages.SETTINGS_SAVED);
+            }
+        } else if (settingsName.equals(card.getSettingsName(heldCard))) {
+            upload.accept(card.getData(heldCard));
+            card.notifyUser(player, MemoryCardMessages.SETTINGS_LOADED);
+        } else {
+            card.notifyUser(player, MemoryCardMessages.INVALID_MACHINE);
+        }
     }
 }

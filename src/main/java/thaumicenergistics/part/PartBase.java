@@ -6,7 +6,6 @@ import appeng.api.config.Upgrades;
 import appeng.api.implementations.IPowerChannelState;
 import appeng.api.implementations.IUpgradeableHost;
 import appeng.api.implementations.items.IMemoryCard;
-import appeng.api.implementations.items.MemoryCardMessages;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.events.MENetworkBootingStatusChange;
 import appeng.api.networking.events.MENetworkEventSubscribe;
@@ -44,6 +43,7 @@ import thaumicenergistics.integration.appeng.grid.ThEGridBlock;
 import thaumicenergistics.integration.appeng.util.ThEActionSource;
 import thaumicenergistics.integration.appeng.util.ThEConfigManager;
 import thaumicenergistics.item.ItemPartBase;
+import thaumicenergistics.util.AEUtil;
 import thaumicenergistics.util.ForgeUtil;
 import thaumicenergistics.util.IThEGridNodeBlock;
 import thaumicenergistics.util.IThEOwnable;
@@ -260,20 +260,13 @@ public abstract class PartBase
         if (held.isEmpty() || !(held.getItem() instanceof IMemoryCard)) return false;
         // The server owns the copy/paste. Both sides swallow the click so the GUI doesn't open
         if (ForgeUtil.isClient()) return true;
-        IMemoryCard card = (IMemoryCard) held.getItem();
-        String name = this.getItemStack(PartItemStack.NETWORK).getTranslationKey();
-        if (player.isSneaking()) {
-            NBTTagCompound data = this.downloadMemoryCardSettings();
-            if (data != null) {
-                card.setMemoryCardContents(held, name, data);
-                card.notifyUser(player, MemoryCardMessages.SETTINGS_SAVED);
-            }
-        } else if (name.equals(card.getSettingsName(held))) {
-            this.uploadMemoryCardSettings(card.getData(held));
-            card.notifyUser(player, MemoryCardMessages.SETTINGS_LOADED);
-        } else {
-            card.notifyUser(player, MemoryCardMessages.INVALID_MACHINE);
-        }
+        AEUtil.useMemoryCard(
+                player,
+                (IMemoryCard) held.getItem(),
+                held,
+                this.getItemStack(PartItemStack.NETWORK).getTranslationKey(),
+                this::downloadMemoryCardSettings,
+                this::uploadMemoryCardSettings);
         return true;
     }
 
